@@ -1,0 +1,61 @@
+name: Database Server Action (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      action:
+        description: 'Action to perform: start or stop'
+        required: true
+        type: string
+      environment:
+        description: 'Environment: dev, uat or prod'
+        required: true
+        type: string
+      script_path:
+        description: 'Path to the script to execute'
+        required: true
+        type: string
+    secrets:
+      AZURE_CLIENT_ID:
+        required: true
+      AZURE_CLIENT_SECRET:
+        required: true
+      AZURE_TENANT_ID:
+        required: true
+
+jobs:
+  execute-action:
+    name: ${{ inputs.action == 'start' && 'Start' || 'Stop' }} ${{ inputs.environment == 'dev' && 'DEV' || (inputs.environment == 'uat' && 'UAT' || 'PROD') }} Database Servers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Pull Docker image
+        run: docker pull jeremy2103/azure-cli-alpine-jq:latest
+      
+      - name: Azure Login and Execute script for ${{ inputs.environment == 'dev' && 'DEV' || (inputs.environment == 'uat' && 'UAT' || 'PROD') }}
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e AZURE_CLIENT_ID \
+            -e AZURE_CLIENT_SECRET \
+            -e AZURE_TENANT_ID \
+            jeremy2103/azure-cli-alpine-jq:latest \
+            sh -c "
+              az login --service-principal \
+                --username \"\$AZURE_CLIENT_ID\" \
+                --password \"\$AZURE_CLIENT_SECRET\" \
+                --tenant \"\$AZURE_TENANT_ID\" \
+                --output none && \
+              sh ${{ inputs.script_path }}
+            "
+      
+      - name: Completion message
+        run: echo "Rutina de ${{ inputs.action == 'start' && 'inicio' || 'apagado' }} finalizada correctamente!"
+
