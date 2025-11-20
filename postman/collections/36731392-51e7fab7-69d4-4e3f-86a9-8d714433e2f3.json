@@ -1,0 +1,3258 @@
+{
+	"info": {
+		"_postman_id": "36731392-51e7fab7-69d4-4e3f-86a9-8d714433e2f3",
+		"name": "Nubestock Backend API",
+		"description": "Colección completa de endpoints para el sistema Nubestock",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AUTH",
+			"item": [
+				{
+					"name": "LOGIN",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "18b018ec-7e48-49dc-9c48-298f45e77da2",
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.success && response.data && response.data.token) {",
+									"        pm.collectionVariables.set('token', response.data.token);",
+									"        pm.collectionVariables.set('user_id', response.data.user.iduser);",
+									"        console.log('Token guardado:', response.data.token);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"id": "36731392-125b6c19-c9fe-43dd-a210-5894a21ebc01",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@nubestock.com\",\n  \"password\": \"Admin123456\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "REGISTER",
+					"id": "36731392-b45fa1a7-4a0c-496c-919d-72299f23bc9b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nameuser\": \"Super Admin\",\n  \"email\": \"admin@nubestock.com\",\n  \"password\": \"Admin123456\",\n  \"phone\": \"+593999999999\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "REFRESH TOKEN",
+					"id": "36731392-786e69b0-cf12-482c-b2e4-04875b1a7d1b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "LOGOUT",
+					"id": "36731392-2a0a6d6b-2376-402c-8904-f4cf68ef14d2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CHANGE PASSWORD",
+					"id": "36731392-0836ec28-eab4-44ee-9f7b-e40235867893",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "x-user-id",
+								"value": "{{user_id}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"currentPassword\": \"Admin123456\",\n  \"newPassword\": \"NewPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/change-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "RESET PASSWORD",
+					"id": "36731392-646fee46-2f16-49a4-b129-3154c0c667bc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@nubestock.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/reset-password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PROFILE",
+					"id": "36731392-a8f5fb53-7eaf-4042-9ac7-d13e59596f4c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-65c89c5a-fe2b-4e88-99f8-5b23b0d53c4a"
+		},
+		{
+			"name": "USERS",
+			"item": [
+				{
+					"name": "LIST USERS",
+					"id": "36731392-f9bfac6d-9529-4b75-a740-c32404165ff0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users?page=1&limit=10&search=&isactive=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "isactive",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET USER BY ID",
+					"id": "36731392-89d2da4c-5913-45f7-bc25-ed4c484532b7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE USER",
+					"id": "36731392-42c24696-0c4c-46dd-a6b5-375620c73e86",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nameuser\": \"Juan Pérez\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"password\": \"Password123\",\n  \"phone\": \"+593987654321\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE USER",
+					"id": "36731392-d4844bc4-61b3-418c-9b13-35b7b5171865",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nameuser\": \"Juan Pérez Actualizado\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"phone\": \"+593987654321\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE USER",
+					"id": "36731392-b2318079-495d-43ba-9473-d99b50cea737",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-3796fec4-d544-4799-80c4-a74d00a99707"
+		},
+		{
+			"name": "PRODUCTS",
+			"item": [
+				{
+					"name": "LIST PRODUCTS",
+					"id": "36731392-4a4c9728-82d0-4095-b016-dad2cd342726",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products?page=1&limit=10&search=&idcategory=&idorigin=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "search",
+									"value": ""
+								},
+								{
+									"key": "idcategory",
+									"value": ""
+								},
+								{
+									"key": "idorigin",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCT BY ID",
+					"id": "36731392-0d5a2b1f-5d78-408d-abf8-f846e25ac37f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE PRODUCT",
+					"id": "36731392-908a1a99-3610-40b2-b7c9-86d28738e9e1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_name\": \"Papitas Limón\",\n  \"idcategory\": \"{{category_id}}\",\n  \"idorigin\": \"{{origin_id}}\",\n  \"description\": \"Papitas sabor limón, paquete de 50g\",\n  \"sku\": \"PAP-LIM-001\",\n  \"unit_price\": 0.50,\n  \"current_stock\": 100,\n  \"minimum_stock\": 25\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE PRODUCT",
+					"id": "36731392-88f3344f-8c4b-448f-8d99-61b249f1d621",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"product_name\": \"Papitas Limón Actualizado\",\n  \"description\": \"Papitas sabor limón mejorado, paquete de 50g\",\n  \"unit_price\": 0.55,\n  \"current_stock\": 120,\n  \"minimum_stock\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE PRODUCT",
+					"id": "36731392-83148519-9d44-40d3-8e74-5b40f4a56d99",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/{{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "BULK CREATE PRODUCTS",
+					"id": "36731392-e3705d03-c413-4df7-a5b9-5e3101514509",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n    {\n      \"product_name\": \"Papitas Limón 150g\",\n      \"idcategory\": \"{{category_id}}\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor limón, paquete de 150g\",\n      \"sku\": \"PAP-LIM-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 100,\n      \"minimum_stock\": 25\n    },\n    {\n      \"product_name\": \"Papitas Queso 150g\",\n      \"idcategory\": \"{{category_id}}\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor queso, paquete de 150g\",\n      \"sku\": \"PAP-QUE-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 80,\n      \"minimum_stock\": 30\n    },\n    {\n      \"product_name\": \"Chifles Salados 70g\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Chifles de plátano verde\",\n      \"sku\": \"CHI-SAL-070\",\n      \"unit_price\": 0.50,\n      \"current_stock\": 50,\n      \"minimum_stock\": 20\n    }\n  ]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCT RECIPES",
+					"id": "36731392-ddcd4c90-265f-4ae4-92de-00886cd3e060",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/recipes?productId={{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "{{product_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE RECIPE",
+					"id": "36731392-1afb2a1e-1753-48c4-829c-5e8f685b51f3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"idmaterial\": \"{{material_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/recipe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CHECK STOCK ALERTS",
+					"id": "36731392-d94cd39d-8dee-4b40-bdfd-7880288ffea6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/check-stock",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"check-stock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "STOCK OPERATION",
+					"id": "36731392-9e721fe4-e6ae-4642-af76-5dd0ec818369",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"operation_type\": \"in\",\n  \"quantity\": 50,\n  \"notes\": \"Entrada de stock\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/stock-operation",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"stock-operation"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-b94811e1-e9f8-47e6-872f-5210d5cd0b06"
+		},
+		{
+			"name": "CATEGORIES",
+			"item": [
+				{
+					"name": "LIST CATEGORIES",
+					"id": "36731392-5ebd176f-ce1c-4332-b012-bb5888d8cb84",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/categories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"categories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET CATEGORY BY ID",
+					"id": "36731392-558205f3-8dc6-4bd2-b016-19eba61e19a8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE CATEGORY",
+					"id": "36731392-675ede30-4c18-4362-9b7b-da4a1ada1ce7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namecategory\": \"Snacks\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/category",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"category"
+							]
+						},
+						"description": "Para crear una categoría padre, simplemente omite el campo 'idpcategory' o envíalo como null. Para crear una categoría hija, envía el UUID de la categoría padre en 'idpcategory'."
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE CATEGORY",
+					"id": "36731392-fbe77cbe-e2c9-460b-9f05-aa324329745a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namecategory\": \"Snacks Actualizado\",\n  \"idpcategory\": \"{{category_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE CATEGORY",
+					"id": "36731392-c1f18c8c-3600-4a22-bbd7-9558bbad23a2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/{{category_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"categories",
+								"{{category_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-28138a93-09a5-4a86-ab85-592bfa315c4d"
+		},
+		{
+			"name": "ORIGINS",
+			"item": [
+				{
+					"name": "LIST ORIGINS",
+					"id": "36731392-f3e07720-1213-4431-8cd4-822e2c35dd64",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/origins",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"origins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ORIGIN BY ID",
+					"id": "36731392-c0eb2943-df9d-4d2d-8a85-a64dc80607ea",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/origins/{{origin_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"origins",
+								"{{origin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE ORIGIN",
+					"id": "36731392-62c94045-612d-4a2a-9781-f1160adb51f5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nameorigin\": \"Planta Quito\",\n  \"idfacility\": \"FAC-001\",\n  \"idprovince\": \"{{province_id}}\",\n  \"idcity\": \"{{city_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/origins",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"origins"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE ORIGIN",
+					"id": "36731392-d204067a-bacf-42a6-8e2e-6ba0ba7fd022",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nameorigin\": \"Planta Quito Actualizada\",\n  \"idfacility\": \"FAC-001\",\n  \"idprovince\": \"{{province_id}}\",\n  \"idcity\": \"{{city_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/origins/{{origin_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"origins",
+								"{{origin_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE ORIGIN",
+					"id": "36731392-6a68ab6c-9376-4c3c-94f5-5d838cfa27e3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/origins/{{origin_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"origins",
+								"{{origin_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-dc1e7ae3-9f25-4758-ad68-e5f1cdfe4441"
+		},
+		{
+			"name": "CLIENTS",
+			"item": [
+				{
+					"name": "GET CLIENTS",
+					"id": "36731392-95ddadc7-3c30-4c0c-989c-926772519dfe",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "",
+									"description": "Buscar por nombre, email, RUC/Cédula o nombre comercial",
+									"disabled": true
+								},
+								{
+									"key": "isactive",
+									"value": "",
+									"description": "Filtrar por estado activo (true/false)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Lista todos los clientes con información completa de localización (país, provincia, ciudad). Incluye filtros opcionales por búsqueda y estado activo."
+					},
+					"response": []
+				},
+				{
+					"name": "GET CLIENT BY ID",
+					"id": "36731392-eccaf297-6ec4-4bc0-9f6a-ca94ed19be46",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients",
+								"{{client_id}}"
+							]
+						},
+						"description": "Obtiene un cliente específico por su ID con información completa de localización"
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE CLIENT",
+					"id": "36731392-6eccf354-3809-4009-8cfe-3c009af7d81a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"client_name\": \"Distribuidora ABC\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"ruc_cedula\": \"1234567890123\",\n  \"email\": \"contacto@distribuidora.com\",\n  \"phone\": \"+593987654321\",\n  \"address\": \"Av. Principal 123\",\n  \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n  \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n  \"requires_credit\": true,\n  \"credit_limit\": 5000.00,\n  \"credit_days\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/clients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients"
+							]
+						},
+						"description": "Crea un nuevo cliente. NOTA: El campo 'isactive' se establece automáticamente como 'true' y NO debe incluirse en el request. Los campos 'idprovince' e 'idcity' son UUIDs que deben existir en las tablas tb_mae_province y tb_mae_city respectivamente. Si 'requires_credit' es true, se recomienda incluir 'credit_limit' y 'credit_days'."
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE CLIENT",
+					"id": "36731392-bff585b4-1a3a-49ed-bb14-c87d7473d764",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"client_name\": \"Distribuidora ABC Actualizada\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"email\": \"nuevo@distribuidora.com\",\n  \"phone\": \"+593987654322\",\n  \"address\": \"Av. Principal 456\",\n  \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n  \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n  \"requires_credit\": true,\n  \"credit_limit\": 10000.00,\n  \"credit_days\": 45,\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients",
+								"{{client_id}}"
+							]
+						},
+						"description": "Actualiza un cliente existente. Todos los campos son opcionales. El campo 'isactive' puede incluirse para cambiar el estado del cliente. Los campos 'idprovince' e 'idcity' son UUIDs que deben existir en las tablas correspondientes."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE CLIENT",
+					"id": "36731392-1e3f06f4-107f-47a3-b39e-eb1d6b4df2cd",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients",
+								"{{client_id}}"
+							]
+						},
+						"description": "Elimina un cliente por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "BULK CREATE CLIENTS",
+					"id": "36731392-df727b32-ef31-421a-8ac9-6a9d321806b3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[\n  {\n    \"client_name\": \"Distribuidora ABC\",\n    \"business_name\": \"Distribuidora ABC S.A.\",\n    \"ruc_cedula\": \"1234567890123\",\n    \"email\": \"contacto@distribuidora.com\",\n    \"phone\": \"+593987654321\",\n    \"address\": \"Av. Principal 123\",\n    \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": true,\n    \"credit_limit\": 5000.00,\n    \"credit_days\": 30\n  },\n  {\n    \"client_name\": \"Distribuidora XYZ\",\n    \"business_name\": \"Distribuidora XYZ S.A.\",\n    \"ruc_cedula\": \"1234567890124\",\n    \"email\": \"contacto@xyz.com\",\n    \"phone\": \"+593987654322\",\n    \"address\": \"Av. Secundaria 456\",\n    \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": false\n  }\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/clients/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"clients",
+								"bulk"
+							]
+						},
+						"description": "Crea o actualiza múltiples clientes en una sola operación. El identificador único es el RUC/Cédula. Si un cliente con el mismo RUC/Cédula ya existe, se actualizará. Si no existe, se creará. NOTA: El campo 'isactive' se establece automáticamente como 'true' para nuevos clientes y NO debe incluirse en el request. Los campos 'idprovince' e 'idcity' son UUIDs opcionales. Máximo 1000 clientes por carga."
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-09caf27f-f545-497e-86b5-b1652b176da2"
+		},
+		{
+			"name": "LOCATIONS",
+			"item": [
+				{
+					"name": "GET ALL LOCATIONS (Complete)",
+					"id": "36731392-9857d2e2-ba3e-4e78-ad5b-8899cb6b6da0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations"
+							]
+						},
+						"description": "Obtiene todas las localidades completas (país, provincia, ciudad) en un solo SELECT usando la vista vw_location_complete"
+					},
+					"response": []
+				},
+				{
+					"name": "GET COMPLETE LOCATIONS (Filtered)",
+					"id": "36731392-c9ef15b6-0982-4364-8b26-43adc6ad3bfe",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/complete?idcountry=&idprovince=&idcity=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"complete"
+							],
+							"query": [
+								{
+									"key": "idcountry",
+									"value": "",
+									"description": "Filtrar por ID de país (UUID)"
+								},
+								{
+									"key": "idprovince",
+									"value": "",
+									"description": "Filtrar por ID de provincia (UUID)"
+								},
+								{
+									"key": "idcity",
+									"value": "",
+									"description": "Filtrar por ID de ciudad (UUID)"
+								}
+							]
+						},
+						"description": "Obtiene localidades completas con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "GET COUNTRIES",
+					"id": "36731392-0984de97-fdd6-4633-99ec-61cb0a5a1420",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							]
+						},
+						"description": "Obtiene todos los países activos"
+					},
+					"response": []
+				},
+				{
+					"name": "GET PROVINCES",
+					"id": "36731392-f1abcd94-cc2a-4890-af14-bcdb65ed25ff",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/provinces?idcountry=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"provinces"
+							],
+							"query": [
+								{
+									"key": "idcountry",
+									"value": "",
+									"description": "Filtrar provincias por ID de país (UUID, opcional)"
+								}
+							]
+						},
+						"description": "Obtiene todas las provincias activas, opcionalmente filtradas por país"
+					},
+					"response": []
+				},
+				{
+					"name": "GET CITIES",
+					"id": "36731392-44665b68-1ab7-4bf1-b154-3f9edb5f0aa5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/cities?idprovince=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "idprovince",
+									"value": "",
+									"description": "Filtrar ciudades por ID de provincia (UUID, opcional)"
+								}
+							]
+						},
+						"description": "Obtiene todas las ciudades activas, opcionalmente filtradas por provincia"
+					},
+					"response": []
+				},
+				{
+					"name": "GET COUNTRY BY ID",
+					"id": "36731392-beb91c67-125b-4d2c-afc5-0fdde8e7cab2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/countries?id={{country_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{country_id}}",
+									"description": "ID del país (UUID)"
+								}
+							]
+						},
+						"description": "Obtiene un país específico por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE COUNTRY",
+					"id": "36731392-57676606-52d7-4e9b-9f6a-c6daaeca39a8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"country_name\": \"Ecuador\",\n  \"country_code\": \"EC\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/countries",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							]
+						},
+						"description": "Crea un nuevo país. El campo 'country_code' debe ser único."
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE COUNTRY",
+					"id": "36731392-6688b618-708a-4796-aabe-e341b10483ca",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"country_name\": \"Ecuador Actualizado\",\n  \"country_code\": \"EC\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/countries?id={{country_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{country_id}}",
+									"description": "ID del país a actualizar (UUID)"
+								}
+							]
+						},
+						"description": "Actualiza un país existente. Todos los campos son opcionales."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE COUNTRY",
+					"id": "36731392-5824d73b-775a-4864-848f-6c52ebe58ec5",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/countries?id={{country_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"countries"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{country_id}}",
+									"description": "ID del país a eliminar (UUID)"
+								}
+							]
+						},
+						"description": "Elimina un país por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "GET PROVINCE BY ID",
+					"id": "36731392-61ea486e-ca29-4c6c-ade6-cce51ecfde6d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/provinces?id={{province_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"provinces"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{province_id}}",
+									"description": "ID de la provincia (UUID)"
+								}
+							]
+						},
+						"description": "Obtiene una provincia específica por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE PROVINCE",
+					"id": "36731392-39913518-1a5d-40e2-b98e-1f685e3eaef1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"province_name\": \"Pichincha\",\n  \"province_code\": \"P\",\n  \"idcountry\": \"{{country_id}}\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/provinces",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"provinces"
+							]
+						},
+						"description": "Crea una nueva provincia. El campo 'idcountry' es requerido y debe existir en la tabla de países."
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE PROVINCE",
+					"id": "36731392-a99a3735-11e0-4326-bd0e-fcc5b61a2179",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"province_name\": \"Pichincha Actualizado\",\n  \"province_code\": \"P\",\n  \"idcountry\": \"{{country_id}}\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/provinces?id={{province_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"provinces"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{province_id}}",
+									"description": "ID de la provincia a actualizar (UUID)"
+								}
+							]
+						},
+						"description": "Actualiza una provincia existente. Todos los campos son opcionales."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE PROVINCE",
+					"id": "36731392-f61fb63c-b0f0-44ca-b9e9-f5a7827bd3c4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/provinces?id={{province_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"provinces"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{province_id}}",
+									"description": "ID de la provincia a eliminar (UUID)"
+								}
+							]
+						},
+						"description": "Elimina una provincia por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "GET CITY BY ID",
+					"id": "36731392-4357d5c6-cd14-48a2-95e8-3e0f1f374898",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/cities?id={{city_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{city_id}}",
+									"description": "ID de la ciudad (UUID)"
+								}
+							]
+						},
+						"description": "Obtiene una ciudad específica por su ID"
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE CITY",
+					"id": "36731392-66040705-dae6-4697-9b12-449cfb876aa1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"city_name\": \"Quito\",\n  \"city_code\": \"UIO\",\n  \"idprovince\": \"{{province_id}}\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/cities",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"cities"
+							]
+						},
+						"description": "Crea una nueva ciudad. El campo 'idprovince' es requerido y debe existir en la tabla de provincias."
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE CITY",
+					"id": "36731392-c1ea154a-fa67-4f55-b966-223630783862",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"city_name\": \"Quito Actualizado\",\n  \"city_code\": \"UIO\",\n  \"idprovince\": \"{{province_id}}\",\n  \"isactive\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/locations/cities?id={{city_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{city_id}}",
+									"description": "ID de la ciudad a actualizar (UUID)"
+								}
+							]
+						},
+						"description": "Actualiza una ciudad existente. Todos los campos son opcionales."
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE CITY",
+					"id": "36731392-3f8062dc-a609-4945-8698-1116ab2dfeed",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/locations/cities?id={{city_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"locations",
+								"cities"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "{{city_id}}",
+									"description": "ID de la ciudad a eliminar (UUID)"
+								}
+							]
+						},
+						"description": "Elimina una ciudad por su ID"
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-7e281149-faab-4156-a9d7-1ca7c1315b1b"
+		},
+		{
+			"name": "MATERIALS",
+			"item": [
+				{
+					"name": "LIST MATERIALS",
+					"id": "36731392-94fd3b5f-3c9d-44ea-99be-8af231efd277",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/materials?type=&idorigin=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"materials"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": ""
+								},
+								{
+									"key": "idorigin",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET MATERIAL BY ID",
+					"id": "36731392-2804dfd0-82db-4260-98d3-a9f70485fcb6",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/materials/{{material_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materials",
+								"{{material_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE MATERIAL",
+					"id": "36731392-948c3f30-46ba-4715-b4bd-029039a07476",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"material_name\": \"Papas\",\n  \"material_code\": \"MAT-PAP-001\",\n  \"material_type\": \"raw\",\n  \"unit_of_measure\": \"kg\",\n  \"cost_per_unit\": 1.50,\n  \"minimum_stock\": 100,\n  \"idorigin\": \"{{origin_id}}\",\n  \"supplier\": \"Proveedor ABC\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/material",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"material"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE MATERIAL",
+					"id": "36731392-e9b11350-0f6c-4980-8a1d-2f8aa102aad7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"material_name\": \"Papas Actualizadas\",\n  \"material_code\": \"MAT-PAP-001\",\n  \"material_type\": \"raw\",\n  \"unit_of_measure\": \"kg\",\n  \"cost_per_unit\": 1.75,\n  \"minimum_stock\": 120,\n  \"idorigin\": \"{{origin_id}}\",\n  \"supplier\": \"Proveedor XYZ\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/materials/{{material_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materials",
+								"{{material_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE MATERIAL",
+					"id": "36731392-42bd5233-6372-4769-917c-e04b92360946",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/materials/{{material_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"materials",
+								"{{material_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-6631aa52-9b08-487a-8e37-7294c27b6f2a"
+		},
+		{
+			"name": "SALES",
+			"item": [
+				{
+					"name": "LIST SALES",
+					"id": "36731392-f3b9d1eb-b8e6-460a-9dd4-ea57ac94b56f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&idclient=&payment_status=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "startDate",
+									"value": ""
+								},
+								{
+									"key": "endDate",
+									"value": ""
+								},
+								{
+									"key": "idclient",
+									"value": ""
+								},
+								{
+									"key": "payment_status",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET SALE BY ID",
+					"id": "36731392-1e36464f-2209-4ce8-8d32-b80259ee0b52",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/{{sale_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"{{sale_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE SALE",
+					"id": "36731392-ee5a5e93-8b37-4940-a87d-47cc9406b9e9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idclient\": \"{{client_id}}\",\n  \"iduser\": \"{{user_id}}\",\n  \"sale_date\": \"2025-10-26\",\n  \"total_amount\": 15.50,\n  \"payment_method\": \"cash\",\n  \"payment_status\": \"paid\",\n  \"notes\": \"Venta al contado\",\n  \"details\": [\n    {\n      \"idfinal_product\": \"{{product_id}}\",\n      \"quantity\": 2,\n      \"unit_price\": 0.50,\n      \"subtotal\": 1.00\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sales",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE SALE",
+					"id": "36731392-ac1cb368-457d-401d-bd67-c17792c8bab8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_status\": \"paid\",\n  \"notes\": \"Venta actualizada\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/{{sale_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"{{sale_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE PAYMENT STATUS",
+					"id": "36731392-6f79bcdd-7264-4c72-bb9d-bb486a9e34c9",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"payment_status\": \"paid\",\n  \"payment_date\": \"2025-10-26\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/payment",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"payment"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET CLIENTS",
+					"id": "36731392-69b6650b-3914-4c10-9c8c-a4feec1fdda4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/clients",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"clients"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE CLIENT",
+					"id": "36731392-5d30ea85-cd34-4b3a-bfbf-2143f4f11612",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"client_name\": \"Distribuidora ABC\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"ruc_cedula\": \"1234567890123\",\n  \"contact_person\": \"María González\",\n  \"email\": \"maria@distribuidora.com\",\n  \"phone\": \"+593987654321\",\n  \"address\": \"Av. Principal 123, Quito\",\n  \"credit_limit\": 1000.00,\n  \"credit_days\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sales/client",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"client"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET SALES STATS",
+					"id": "36731392-83dbebcb-4d0b-47bb-87ab-b1bbe8abaf19",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET OVERDUE SALES",
+					"id": "36731392-722b3947-cd19-4264-853b-78bd1ab1d15c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/overdue",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"overdue"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-8b9ff5cf-ff0d-41be-b0ac-662d74174c2d"
+		},
+		{
+			"name": "PRODUCTION",
+			"item": [
+				{
+					"name": "GET DAILY PRODUCTION",
+					"id": "36731392-f2090f16-61ce-4c8c-b0c6-ae222c6ff696",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/production/daily?page=1&limit=10&startDate=&endDate=&iduser=&idfinal_product=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "startDate",
+									"value": ""
+								},
+								{
+									"key": "endDate",
+									"value": ""
+								},
+								{
+									"key": "iduser",
+									"value": ""
+								},
+								{
+									"key": "idfinal_product",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "REGISTER PRODUCTION",
+					"id": "36731392-de97da7d-3fad-4313-a495-b58c38dd5002",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"iduser\": \"{{user_id}}\",\n  \"production_date\": \"2025-10-26\",\n  \"quantity_produced\": 100,\n  \"quality_control\": \"passed\",\n  \"notes\": \"Producción normal\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/production/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE PRODUCTION",
+					"id": "36731392-9d3b1558-9c0a-4681-911e-0e8ac668fbb0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"quantity_produced\": 120,\n  \"quality_control\": \"passed\",\n  \"notes\": \"Producción actualizada\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/production/{{production_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"{{production_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCTION STATS",
+					"id": "36731392-bdce4ab0-765a-4bed-a43a-b659fbf25bd7",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/production/stats?startDate=&endDate=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"stats"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": ""
+								},
+								{
+									"key": "endDate",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET TRANSACTIONS",
+					"id": "36731392-728f80c7-4aa3-4026-9b77-5f18e957c51c",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/production/transactions?type=&startDate=&endDate=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": ""
+								},
+								{
+									"key": "startDate",
+									"value": ""
+								},
+								{
+									"key": "endDate",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE TRANSACTION",
+					"id": "36731392-34bb0820-2fa8-4e1d-a5f9-915df93ed5da",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idmaterial\": \"{{material_id}}\",\n  \"transaction_type\": \"in\",\n  \"quantity\": 50,\n  \"unit_cost\": 0.25,\n  \"total_cost\": 12.50,\n  \"transaction_date\": \"2025-10-26\",\n  \"notes\": \"Compra de material\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/production/transaction",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"production",
+								"transaction"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-13ce92fb-d00d-4323-87ff-db3e7c22bdf3"
+		},
+		{
+			"name": "ROLES",
+			"item": [
+				{
+					"name": "LIST ROLES",
+					"id": "36731392-82b532cd-92a3-4d03-be77-28ee5af9cf2d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET ROLE BY ID",
+					"id": "36731392-f35ec7bd-df73-4bc7-b9f8-15329a53843a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PERMISSIONS",
+					"id": "36731392-b8d08d2a-008d-432c-b341-64c429dce75f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE ROLE",
+					"id": "36731392-1757fc71-061d-4aed-80d3-d5ed97fac6a0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namerole\": \"Vendedor\",\n  \"description\": \"Rol para vendedores\",\n  \"permissions\": [\"{{permission_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE ROLE",
+					"id": "36731392-c6f50e33-963f-4a76-ac57-3ea9ae2dc18e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"namerole\": \"Vendedor Actualizado\",\n  \"description\": \"Rol actualizado para vendedores\",\n  \"permissions\": [\"{{permission_id}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE ROLE",
+					"id": "36731392-cd4ed65d-c2ef-4a47-a760-42f71e413362",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/{{role_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"{{role_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-57893a44-cd5c-4bee-b4fd-8abbce864535"
+		},
+		{
+			"name": "USER-PERMISSIONS",
+			"item": [
+				{
+					"name": "GET USER PERMISSIONS",
+					"id": "36731392-c9e960bf-c331-4ac7-b8fe-46b0c2474fb1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user-permissions/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-permissions",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CHECK PERMISSION",
+					"id": "36731392-69d7a3ff-237c-4328-9ea2-5ba0b1677c66",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/user-permissions/check?userId={{user_id}}&permission=products.create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-permissions",
+								"check"
+							],
+							"query": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								},
+								{
+									"key": "permission",
+									"value": "products.create"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ASSIGN ROLE TO USER",
+					"id": "36731392-4baf600f-1257-4c01-a781-321bc8749790",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"{{user_id}}\",\n  \"roleId\": \"{{role_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user-permissions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-permissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "REMOVE ROLE FROM USER",
+					"id": "36731392-8e036baf-ec5d-492a-8fe3-85203c999e20",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roleId\": \"{{role_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/user-permissions/{{user_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user-permissions",
+								"{{user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-44b374ab-3534-4508-b267-c7213618dea2"
+		},
+		{
+			"name": "STATS",
+			"item": [
+				{
+					"name": "GET STATS",
+					"id": "36731392-cded85fb-6c37-4a2c-a638-5cb123571d0b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"stats"
+							]
+						},
+						"description": "Obtiene todas las estadísticas del sistema incluyendo:\n- Productos: total, activos, inactivos, con bajo stock, valor total del inventario\n- Categorías: total, activas, inactivas\n- Ventas: total, activas, canceladas, por estado, valores (total, pagado, pendiente, vencido), del mes y del año\n- Clientes: total, activos, inactivos, con crédito, límite total de crédito\n- Producción: total, del mes, del año\n- Alertas: total, activas, por prioridad, por tipo\n- Usuarios: total, activos, inactivos\n- Transacciones: total, del mes"
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-b09b751a-76c9-42d4-bb1d-12cb336d3325"
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:7071/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "product_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "sale_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "client_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "category_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "origin_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "material_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "role_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "permission_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "production_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
