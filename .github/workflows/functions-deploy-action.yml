@@ -25,6 +25,10 @@ on:
         required: true
       AZ_RESOURCE_GROUP:
         required: true
+      AZ_LOCATION:
+        required: false
+      AZ_APP_SERVICE_PLAN:
+        required: false
       DATABASE_HOSTNAME:
         required: true
       DATABASE_PORT:
@@ -127,6 +131,112 @@ jobs:
             --output none
           
           az account set --subscription "${{ secrets.AZ_SUBSCRIPTION_ID }}"
+
+      - name: Verificar y Crear Recursos de Azure
+        run: |
+          echo "🔍 Verificando recursos de Azure..."
+          echo "Resource Group: ${{ secrets.AZ_RESOURCE_GROUP }}"
+          echo "Function App Name: ${{ secrets.AZ_FUNCTION_APP_NAME }}"
+          echo ""
+          
+          # Verificar o crear Resource Group
+          echo "📋 Verificando Resource Group..."
+          if az group show --name "${{ secrets.AZ_RESOURCE_GROUP }}" &>/dev/null; then
+            echo "✅ Resource Group encontrado"
+            LOCATION=$(az group show --name "${{ secrets.AZ_RESOURCE_GROUP }}" --query location -o tsv)
+            echo "📍 Ubicación del Resource Group: $LOCATION"
+          else
+            echo "⚠️ Resource Group no encontrado. Creando nuevo Resource Group en East US..."
+            az group create \
+              --name "${{ secrets.AZ_RESOURCE_GROUP }}" \
+              --location "eastus"
+            LOCATION="eastus"
+            echo "✅ Resource Group creado exitosamente en East US"
+          fi
+          
+          # Variables
+          FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
+          RESOURCE_GROUP="${{ secrets.AZ_RESOURCE_GROUP }}"
+          
+          # Determinar ubicación (por defecto: eastus, o usar la del RG si existe, o el secret)
+          if [ -n "${{ secrets.AZ_LOCATION }}" ]; then
+            LOCATION="${{ secrets.AZ_LOCATION }}"
+          elif [ -n "$LOCATION" ]; then
+            # Ya está definida desde el Resource Group
+            LOCATION="$LOCATION"
+          else
+            # Por defecto: East US (gratis)
+            LOCATION="eastus"
+          fi
+          
+          echo "📍 Ubicación a usar: $LOCATION"
+          
+          # Verificar o crear App Service Plan
+          APP_SERVICE_PLAN_NAME="${{ secrets.AZ_APP_SERVICE_PLAN }}"
+          if [ -z "$APP_SERVICE_PLAN_NAME" ]; then
+            APP_SERVICE_PLAN_NAME="${FUNCTION_APP_NAME}-plan"
+          fi
+          
+          echo ""
+          echo "📋 Verificando App Service Plan: $APP_SERVICE_PLAN_NAME"
+          if az appservice plan show --name "$APP_SERVICE_PLAN_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
+            echo "✅ App Service Plan encontrado"
+          else
+            echo "⚠️ App Service Plan no encontrado. Creando nuevo plan (FREE tier)..."
+            az appservice plan create \
+              --name "$APP_SERVICE_PLAN_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --location "$LOCATION" \
+              --sku FREE \
+              --is-linux
+            echo "✅ App Service Plan creado exitosamente (FREE tier)"
+          fi
+          
+          # Verificar que el Function App existe
+          echo ""
+          echo "🔍 Verificando Function App..."
+          if az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
+            echo "✅ Function App encontrado - no es necesario crearlo"
+          else
+            echo "⚠️ Function App no encontrado. Creando nuevo Function App..."
+            
+            # Crear Storage Account para el Function App (requerido)
+            # El nombre debe ser único globalmente, solo minúsculas y números, 3-24 caracteres
+            STORAGE_ACCOUNT_NAME=$(echo "$FUNCTION_APP_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '-' | cut -c1-20)
+            STORAGE_ACCOUNT_NAME="${STORAGE_ACCOUNT_NAME}sa"
+            
+            echo "📦 Verificando Storage Account: $STORAGE_ACCOUNT_NAME"
+            if az storage account show --name "$STORAGE_ACCOUNT_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
+              echo "✅ Storage Account encontrado"
+            else
+              echo "📦 Creando Storage Account..."
+              az storage account create \
+                --name "$STORAGE_ACCOUNT_NAME" \
+                --resource-group "$RESOURCE_GROUP" \
+                --location "$LOCATION" \
+                --sku Standard_LRS
+              echo "✅ Storage Account creado"
+            fi
+            
+            # Crear Function App
+            echo "🚀 Creando Function App..."
+            az functionapp create \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --storage-account "$STORAGE_ACCOUNT_NAME" \
+              --plan "$APP_SERVICE_PLAN_NAME" \
+              --runtime "node" \
+              --runtime-version "${{ env.NODE_VERSION }}" \
+              --functions-version 4 \
+              --os-type Linux
+            
+            echo "✅ Function App creado exitosamente"
+          fi
+          
+          # Mostrar información del Function App
+          echo ""
+          echo "📋 Información del Function App:"
+          az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" --query "{Name:name, State:state, Location:location, Runtime:siteConfig.linuxFxVersion}" -o table
 
       - name: Sincronizar Application Settings desde GitHub Secrets a Azure Function
         run: |
