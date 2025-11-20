@@ -1,0 +1,144 @@
+name: Deploy Azure Functions - Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment a desplegar (NUBESTOCK_DEV, NUBESTOCK_UAT, NUBESTOCK_PRD)'
+        required: true
+        type: string
+      node_version:
+        description: 'Versión de Node.js'
+        required: false
+        type: string
+        default: '22'
+    secrets:
+      AZ_CLIENT_ID:
+        required: true
+      AZ_TENANT_ID:
+        required: true
+      AZ_SUBSCRIPTION_ID:
+        required: true
+      AZ_FUNCTION_APP_NAME:
+        required: true
+      AZ_RESOURCE_GROUP:
+        required: true
+      DATABASE_HOSTNAME:
+        required: true
+      DATABASE_PORT:
+        required: true
+      DATABASE_USERNAME:
+        required: true
+      DATABASE_PASSWORD:
+        required: true
+      DATABASE_NAME:
+        required: true
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'backend-deploy'
+  NODE_VERSION: ${{ inputs.node_version }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: 'Checkout Backend Repository'
+        uses: actions/checkout@v4
+        with:
+          path: backend
+
+      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 'Resolve Project Dependencies Using Npm'
+        shell: bash
+        working-directory: ./backend
+        run: |
+          npm install
+          npm run build --if-present
+
+      - name: Zip artifact for deployment
+        shell: bash
+        working-directory: ./backend
+        run: zip -r ../release.zip ./*
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: node-app
+          path: release.zip
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+    environment:
+      name: ${{ inputs.environment }}
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+
+      - name: Unzip artifact for deployment
+        run: unzip release.zip -d backend-deploy
+
+      - name: List ZIP contents
+        run: unzip -l release.zip
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
+
+      - name: Verificar Secrets del Environment
+        run: |
+          # Verificar que todas las variables están definidas
+          echo "🔍 Verificando variables del environment: ${{ inputs.environment }}"
+          
+          # Secrets de Azure (Autenticación)
+          if [ -z "${{ secrets.AZ_CLIENT_ID }}" ]; then echo "❌ ERROR: La variable AZ_CLIENT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_CLIENT_ID detectada correctamente."; fi
+          if [ -z "${{ secrets.AZ_TENANT_ID }}" ]; then echo "❌ ERROR: La variable AZ_TENANT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_TENANT_ID detectada correctamente."; fi
+          if [ -z "${{ secrets.AZ_SUBSCRIPTION_ID }}" ]; then echo "❌ ERROR: La variable AZ_SUBSCRIPTION_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_SUBSCRIPTION_ID detectada correctamente."; fi
+          
+          # Secrets de Azure (Recursos)
+          if [ -z "${{ secrets.AZ_FUNCTION_APP_NAME }}" ]; then echo "❌ ERROR: La variable AZ_FUNCTION_APP_NAME no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_FUNCTION_APP_NAME detectada correctamente."; fi
+          if [ -z "${{ secrets.AZ_RESOURCE_GROUP }}" ]; then echo "❌ ERROR: La variable AZ_RESOURCE_GROUP no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_RESOURCE_GROUP detectada correctamente."; fi
+          
+          # Secrets de Base de Datos
+          if [ -z "${{ secrets.DATABASE_HOSTNAME }}" ]; then echo "❌ ERROR: La variable DATABASE_HOSTNAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_HOSTNAME detectada correctamente."; fi
+          if [ -z "${{ secrets.DATABASE_PORT }}" ]; then echo "❌ ERROR: La variable DATABASE_PORT no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_PORT detectada correctamente."; fi
+          if [ -z "${{ secrets.DATABASE_USERNAME }}" ]; then echo "❌ ERROR: La variable DATABASE_USERNAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_USERNAME detectada correctamente."; fi
+          if [ -z "${{ secrets.DATABASE_PASSWORD }}" ]; then echo "❌ ERROR: La variable DATABASE_PASSWORD no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_PASSWORD detectada correctamente."; fi
+          if [ -z "${{ secrets.DATABASE_NAME }}" ]; then echo "❌ ERROR: La variable DATABASE_NAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_NAME detectada correctamente."; fi
+
+      - name: Sincronizar Application Settings desde GitHub Secrets a Azure Function
+        run: |
+          echo "✅ Todas las variables necesarias están presentes. Procediendo a sincronizar..."
+
+          az functionapp config appsettings set \
+            --name '${{ secrets.AZ_FUNCTION_APP_NAME }}' \
+            --resource-group '${{ secrets.AZ_RESOURCE_GROUP }}' \
+            --settings \
+              DATABASE_HOSTNAME="${{ secrets.DATABASE_HOSTNAME }}" \
+              DATABASE_PORT="${{ secrets.DATABASE_PORT }}" \
+              DATABASE_USERNAME="${{ secrets.DATABASE_USERNAME }}" \
+              DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
+              DATABASE_NAME="${{ secrets.DATABASE_NAME }}"
+
+      - name: 'Run Azure Functions Action'
+        uses: Azure/functions-action@v1
+        id: fa
+        with:
+          app-name: ${{ secrets.AZ_FUNCTION_APP_NAME }}
+          slot-name: 'Production'
+          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
