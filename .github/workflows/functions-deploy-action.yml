@@ -93,19 +93,12 @@ jobs:
       - name: List ZIP contents
         run: unzip -l release.zip
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZ_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZ_TENANT_ID }}
-          subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
-
       - name: Verificar Secrets del Environment
         run: |
-          # Verificar que todas las variables están definidas
+          # Verificar que todas las variables están definidas ANTES de hacer login
           echo "🔍 Verificando variables del environment: ${{ inputs.environment }}"
           
-          # Secrets de Azure (Autenticación)
+          # Secrets de Azure (Autenticación) - Verificar primero porque se necesitan para el login
           if [ -z "${{ secrets.AZ_CLIENT_ID }}" ]; then echo "❌ ERROR: La variable AZ_CLIENT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_CLIENT_ID detectada correctamente."; fi
           if [ -z "${{ secrets.AZ_TENANT_ID }}" ]; then echo "❌ ERROR: La variable AZ_TENANT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_TENANT_ID detectada correctamente."; fi
           if [ -z "${{ secrets.AZ_SUBSCRIPTION_ID }}" ]; then echo "❌ ERROR: La variable AZ_SUBSCRIPTION_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_SUBSCRIPTION_ID detectada correctamente."; fi
@@ -120,6 +113,15 @@ jobs:
           if [ -z "${{ secrets.DATABASE_USERNAME }}" ]; then echo "❌ ERROR: La variable DATABASE_USERNAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_USERNAME detectada correctamente."; fi
           if [ -z "${{ secrets.DATABASE_PASSWORD }}" ]; then echo "❌ ERROR: La variable DATABASE_PASSWORD no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_PASSWORD detectada correctamente."; fi
           if [ -z "${{ secrets.DATABASE_NAME }}" ]; then echo "❌ ERROR: La variable DATABASE_NAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_NAME detectada correctamente."; fi
+          
+          echo "✅ Todos los secrets están presentes. Procediendo con el login a Azure..."
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBSCRIPTION_ID }}
 
       - name: Sincronizar Application Settings desde GitHub Secrets a Azure Function
         run: |
