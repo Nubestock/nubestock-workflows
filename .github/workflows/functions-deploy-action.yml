@@ -12,6 +12,14 @@ on:
         required: false
         type: string
         default: '22'
+      repo_url:
+        description: 'URL del repositorio (se obtiene automáticamente)'
+        required: false
+        type: string
+      branch:
+        description: 'Branch del repositorio (se obtiene automáticamente)'
+        required: false
+        type: string
     secrets:
       AZ_CLIENT_ID:
         required: true
@@ -97,6 +105,13 @@ jobs:
 
       - name: List ZIP contents
         run: unzip -l release.zip
+
+      - name: Checkout nubestock-workflows for ARM templates
+        uses: actions/checkout@v4
+        with:
+          repository: Nubestock/nubestock-workflows
+          path: nubestock-workflows
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Verificar Secrets del Environment
         run: |
@@ -198,39 +213,64 @@ jobs:
           if az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
             echo "✅ Function App encontrado - no es necesario crearlo"
           else
-            echo "⚠️ Function App no encontrado. Creando nuevo Function App..."
+            echo "⚠️ Function App no encontrado. Se creará usando ARM template."
             
-            # Crear Storage Account para el Function App (requerido)
-            # El nombre debe ser único globalmente, solo minúsculas y números, 3-24 caracteres
-            STORAGE_ACCOUNT_NAME=$(echo "$FUNCTION_APP_NAME" | tr '[:upper:]' '[:lower:]' | tr -d '-' | cut -c1-20)
-            STORAGE_ACCOUNT_NAME="${STORAGE_ACCOUNT_NAME}sa"
-            
-            echo "📦 Verificando Storage Account: $STORAGE_ACCOUNT_NAME"
-            if az storage account show --name "$STORAGE_ACCOUNT_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
-              echo "✅ Storage Account encontrado"
+            # Obtener información del repositorio
+            if [ -n "${{ inputs.repo_url }}" ]; then
+              REPO_URL="${{ inputs.repo_url }}"
             else
-              echo "📦 Creando Storage Account..."
-              az storage account create \
-                --name "$STORAGE_ACCOUNT_NAME" \
-                --resource-group "$RESOURCE_GROUP" \
-                --location "$LOCATION" \
-                --sku Standard_LRS
-              echo "✅ Storage Account creado"
+              REPO_URL="https://github.com/${{ github.repository }}"
             fi
             
-            # Crear Function App
-            echo "🚀 Creando Function App..."
-            az functionapp create \
-              --name "$FUNCTION_APP_NAME" \
-              --resource-group "$RESOURCE_GROUP" \
-              --storage-account "$STORAGE_ACCOUNT_NAME" \
-              --plan "$APP_SERVICE_PLAN_NAME" \
-              --runtime "node" \
-              --runtime-version "${{ env.NODE_VERSION }}" \
-              --functions-version 4 \
-              --os-type Linux
+            if [ -n "${{ inputs.branch }}" ]; then
+              BRANCH="${{ inputs.branch }}"
+            else
+              BRANCH="${{ github.ref_name }}"
+            fi
             
-            echo "✅ Function App creado exitosamente"
+            # Leer parámetros base desde el template y actualizar valores dinámicos
+            echo "📄 Preparando parámetros para ARM template..."
+            
+            # Leer el archivo de parámetros base y actualizar valores dinámicos usando jq
+            PARAMS_FILE="./nubestock-workflows/.github/arm-templates/parameters.json"
+            TEMP_PARAMS="/tmp/parameters.json"
+            
+            # Copiar el archivo base
+            cp "$PARAMS_FILE" "$TEMP_PARAMS"
+            
+            # Actualizar valores dinámicos usando jq
+            jq --arg subId "${{ secrets.AZ_SUBSCRIPTION_ID }}" \
+               --arg name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
+               --arg location "$LOCATION" \
+               --arg repoUrl "$REPO_URL" \
+               --arg branch "$BRANCH" \
+               --arg resourceGroup "$RESOURCE_GROUP" \
+               --arg hostingPlan "$APP_SERVICE_PLAN_NAME" \
+               '.parameters.subscriptionId.value = $subId |
+                .parameters.name.value = $name |
+                .parameters.location.value = $location |
+                .parameters.repoUrl.value = $repoUrl |
+                .parameters.branch.value = $branch |
+                .parameters.serverFarmResourceGroup.value = $resourceGroup |
+                .parameters.hostingPlanName.value = $hostingPlan' \
+               "$TEMP_PARAMS" > "$TEMP_PARAMS.tmp" && mv "$TEMP_PARAMS.tmp" "$TEMP_PARAMS"
+            
+            # Desplegar ARM template
+            echo "🚀 Desplegando ARM template..."
+            az deployment group create \
+              --resource-group "$RESOURCE_GROUP" \
+              --template-file "./nubestock-workflows/.github/arm-templates/template.json" \
+              --parameters "@$TEMP_PARAMS"
+            
+            if [ $? -eq 0 ]; then
+              echo "✅ Function App creado exitosamente usando ARM template"
+            else
+              echo "❌ Error al desplegar ARM template"
+              exit 1
+            fi
+            
+            # Limpiar archivo temporal
+            rm -f "$TEMP_PARAMS"
           fi
           
           # Mostrar información del Function App
