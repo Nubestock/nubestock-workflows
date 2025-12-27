@@ -3291,14 +3291,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/sales/reports/daily?startDate=2025-12-01&endDate=2025-12-31",
+							"raw": "{{base_url}}/sales/reports/by-client?startDate=2025-12-01&endDate=2025-12-31&limit=50",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"sales",
 								"reports",
-								"daily"
+								"by-client"
 							],
 							"query": [
 								{
@@ -3308,6 +3308,10 @@
 								{
 									"key": "endDate",
 									"value": "2025-12-31"
+								},
+								{
+									"key": "limit",
+									"value": "50"
 								}
 							]
 						}
@@ -3315,7 +3319,7 @@
 					"response": []
 				},
 				{
-					"name": "SALES BY CLIENT REPORT Copy",
+					"name": "TOP PRODUCT SALES REPORT",
 					"id": "36731392-73d0f392-31fe-4531-a970-0dfef22c24ad",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -3329,14 +3333,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/sales/reports/daily?startDate=2025-12-01&endDate=2025-12-31",
+							"raw": "{{base_url}}/sales/reports/top-products?startDate=2025-12-01&endDate=2025-12-31&limit=20",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"sales",
 								"reports",
-								"daily"
+								"top-products"
 							],
 							"query": [
 								{
@@ -3346,6 +3350,10 @@
 								{
 									"key": "endDate",
 									"value": "2025-12-31"
+								},
+								{
+									"key": "limit",
+									"value": "20"
 								}
 							]
 						}
