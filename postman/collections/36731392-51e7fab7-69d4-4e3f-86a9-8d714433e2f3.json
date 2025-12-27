@@ -3319,7 +3319,7 @@
 					"response": []
 				},
 				{
-					"name": "SALES BY CLIENT REPORT Copy",
+					"name": "DASHBOARD SUMMARY REPORT",
 					"id": "36731392-a9b66cfe-76b8-4bda-a2d2-45a4a65aef7b",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -3333,14 +3333,14 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/sales/reports/by-client?startDate=2025-12-01&endDate=2025-12-31&limit=50",
+							"raw": "{{base_url}}/sales/reports/summary?startDate=2025-12-01&endDate=2025-12-31",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
 								"sales",
 								"reports",
-								"by-client"
+								"summary"
 							],
 							"query": [
 								{
@@ -3350,10 +3350,6 @@
 								{
 									"key": "endDate",
 									"value": "2025-12-31"
-								},
-								{
-									"key": "limit",
-									"value": "50"
 								}
 							]
 						}
