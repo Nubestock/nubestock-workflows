@@ -3292,18 +3292,6 @@
 				}
 			],
 			"id": "36731392-c54e403d-cfd6-4a04-b40c-c5f113cad8d4"
-		},
-		{
-			"name": "New Request",
-			"id": "36731392-a044bc14-df09-4ecc-97fe-cb3971ff8b78",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": []
-			},
-			"response": []
 		}
 	],
 	"variable": [
