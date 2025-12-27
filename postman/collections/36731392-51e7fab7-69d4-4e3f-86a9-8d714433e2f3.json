@@ -3319,6 +3319,48 @@
 					"response": []
 				},
 				{
+					"name": "SALES BY CLIENT REPORT Copy",
+					"id": "36731392-a9b66cfe-76b8-4bda-a2d2-45a4a65aef7b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/by-client?startDate=2025-12-01&endDate=2025-12-31&limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"by-client"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "TOP PRODUCT SALES REPORT",
 					"id": "36731392-73d0f392-31fe-4531-a970-0dfef22c24ad",
 					"protocolProfileBehavior": {
