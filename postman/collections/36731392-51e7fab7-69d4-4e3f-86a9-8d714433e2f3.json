@@ -3239,7 +3239,7 @@
 			"name": "REPORTS",
 			"item": [
 				{
-					"name": "LIST SALES Copy",
+					"name": "Daily Sales Reports",
 					"id": "36731392-cfd2cc81-31a6-4ac8-8584-73ff3df5883f",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
