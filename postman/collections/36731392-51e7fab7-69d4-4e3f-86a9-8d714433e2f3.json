@@ -3237,7 +3237,60 @@
 		},
 		{
 			"name": "REPORTS",
-			"item": [],
+			"item": [
+				{
+					"name": "LIST SALES Copy",
+					"id": "36731392-7e13b9e2-5a8a-4cb3-a51f-0704b66a1ccc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&idclient=&payment_status=",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "startDate",
+									"value": ""
+								},
+								{
+									"key": "endDate",
+									"value": ""
+								},
+								{
+									"key": "idclient",
+									"value": ""
+								},
+								{
+									"key": "payment_status",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"id": "36731392-c54e403d-cfd6-4a04-b40c-c5f113cad8d4"
 		}
 	],
