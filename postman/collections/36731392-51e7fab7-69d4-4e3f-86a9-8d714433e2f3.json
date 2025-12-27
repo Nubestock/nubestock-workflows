@@ -3239,7 +3239,7 @@
 			"name": "REPORTS",
 			"item": [
 				{
-					"name": "LIST SALES Copy",
+					"name": "DAILY SALES REPORT",
 					"id": "36731392-7e13b9e2-5a8a-4cb3-a51f-0704b66a1ccc",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -3253,37 +3253,23 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&idclient=&payment_status=",
+							"raw": "{{base_url}}/sales/reports/daily?startDate=2025-12-01&endDate=2025-12-31",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"sales"
+								"sales",
+								"reports",
+								"daily"
 							],
 							"query": [
 								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
 									"key": "startDate",
-									"value": ""
+									"value": "2025-12-01"
 								},
 								{
 									"key": "endDate",
-									"value": ""
-								},
-								{
-									"key": "idclient",
-									"value": ""
-								},
-								{
-									"key": "payment_status",
-									"value": ""
+									"value": "2025-12-31"
 								}
 							]
 						}
