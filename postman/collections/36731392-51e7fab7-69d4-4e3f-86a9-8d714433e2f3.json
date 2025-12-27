@@ -687,79 +687,6 @@
 					"response": []
 				},
 				{
-					"name": "GET PRODUCT RECIPES",
-					"id": "36731392-ddcd4c90-265f-4ae4-92de-00886cd3e060",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/products/recipes?productId={{product_id}}",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"products",
-								"recipes"
-							],
-							"query": [
-								{
-									"key": "productId",
-									"value": "{{product_id}}"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "CREATE RECIPE",
-					"id": "36731392-1afb2a1e-1753-48c4-829c-5e8f685b51f3",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							},
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"idmaterial\": \"{{material_id}}\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{base_url}}/products/recipe",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"products",
-								"recipe"
-							]
-						}
-					},
-					"response": []
-				},
-				{
 					"name": "CHECK STOCK ALERTS",
 					"id": "36731392-d94cd39d-8dee-4b40-bdfd-7880288ffea6",
 					"protocolProfileBehavior": {
@@ -3231,7 +3158,81 @@
 		},
 		{
 			"name": "RECEIPES",
-			"item": [],
+			"item": [
+				{
+					"name": "GET PRODUCT RECIPES",
+					"id": "36731392-ddcd4c90-265f-4ae4-92de-00886cd3e060",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/recipes?productId={{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "{{product_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE RECIPE",
+					"id": "36731392-1afb2a1e-1753-48c4-829c-5e8f685b51f3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"idmaterial\": \"{{material_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/recipe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipe"
+							]
+						}
+					},
+					"response": []
+				}
+			],
 			"id": "36731392-9850c82e-6cea-41b0-9935-298d4a9f11cb"
 		}
 	],
