@@ -3203,7 +3203,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "GET ALERT BY ID",
 					"id": "36731392-485111d4-26c4-4d71-8f02-381e4ab3dcfc",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
