@@ -3213,6 +3213,18 @@
 						"header": []
 					},
 					"response": []
+				},
+				{
+					"name": "UPDATE ALERT",
+					"id": "36731392-09a08b7a-8c20-47b7-8840-248e397d496d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "36731392-98b4cfe6-a98e-4d48-b993-c9af13678c47"
