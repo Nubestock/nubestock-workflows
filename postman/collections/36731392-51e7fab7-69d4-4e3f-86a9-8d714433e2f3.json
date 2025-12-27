@@ -3277,7 +3277,7 @@
 					"response": []
 				},
 				{
-					"name": "SALES BY CLIENT",
+					"name": "SALES BY CLIENT REPORT",
 					"id": "36731392-f6a2551e-2805-42f4-9972-0c6793882ebc",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
