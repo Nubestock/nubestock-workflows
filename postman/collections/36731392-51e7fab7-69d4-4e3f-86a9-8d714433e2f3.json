@@ -3237,60 +3237,7 @@
 		},
 		{
 			"name": "REPORTS",
-			"item": [
-				{
-					"name": "Daily Sales Reports",
-					"id": "36731392-cfd2cc81-31a6-4ac8-8584-73ff3df5883f",
-					"protocolProfileBehavior": {
-						"disableBodyPruning": true
-					},
-					"request": {
-						"method": "GET",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"url": {
-							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&idclient=&payment_status=",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"sales"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "1"
-								},
-								{
-									"key": "limit",
-									"value": "10"
-								},
-								{
-									"key": "startDate",
-									"value": ""
-								},
-								{
-									"key": "endDate",
-									"value": ""
-								},
-								{
-									"key": "idclient",
-									"value": ""
-								},
-								{
-									"key": "payment_status",
-									"value": ""
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			],
+			"item": [],
 			"id": "36731392-c54e403d-cfd6-4a04-b40c-c5f113cad8d4"
 		}
 	],
