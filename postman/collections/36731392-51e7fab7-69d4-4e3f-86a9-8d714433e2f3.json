@@ -3188,8 +3188,21 @@
 			"id": "36731392-b09b751a-76c9-42d4-bb1d-12cb336d3325"
 		},
 		{
-			"name": "New Folder",
-			"item": [],
+			"name": "ALERTS",
+			"item": [
+				{
+					"name": "GET ALERTS",
+					"id": "36731392-e9560aa2-2e24-488b-92a6-ddda7ccf6f5e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
 			"id": "36731392-98b4cfe6-a98e-4d48-b993-c9af13678c47"
 		}
 	],
