@@ -3275,6 +3275,44 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "SALES BY CLIENT",
+					"id": "36731392-f6a2551e-2805-42f4-9972-0c6793882ebc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/daily?startDate=2025-12-01&endDate=2025-12-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "36731392-c54e403d-cfd6-4a04-b40c-c5f113cad8d4"
