@@ -2882,7 +2882,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"namerole\": \"Vendedor Actualizado\",\n  \"description\": \"Rol actualizado para vendedores\",\n  \"permissions\": [\"{{permission_id}}\"]\n}",
+							"raw": "{\n  \"namerole\": \"Administrator\",\n  \"description\": \"Administrador del sistema con todos los permisos\",\n  \"permissions\": [\n    \"7d61d0ab-936e-46cb-a74e-5417b7c438ac\",\n    \"aa025cff-ecfa-4efa-b617-9768dc1ac4a1\",\n    \"b8de06dd-0af2-4224-8b88-3e271a80289a\",\n    \"94d4a945-335d-4bf4-8488-9588e8669397\",\n    \"69e34883-bd41-4c1e-b6aa-b8dc78ec68e2\",\n    \"fce74bd3-acb8-4529-b0dd-9236fd8c3410\"\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2937,7 +2937,26 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"all"
+							]
+						}
 					},
 					"response": []
 				}
@@ -2958,7 +2977,8 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"value": "Bearer {{token}}",
+								"disabled": true
 							}
 						],
 						"url": {
