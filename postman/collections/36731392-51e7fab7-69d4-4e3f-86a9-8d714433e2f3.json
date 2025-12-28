@@ -2559,7 +2559,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"iduser\": \"{{user_id}}\",\n  \"production_date\": \"2025-10-26\",\n  \"quantity_produced\": 100,\n  \"quality_control\": \"passed\",\n  \"notes\": \"Producción normal\"\n}",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"iduser\": \"{{user_id}}\",\n \"production_date\": \"2025-12-11T10:00:00.000Z\",\n    \"quantity_produced\": 40,\n    \"unit_of_measure\": \"unidades\",\n    \"notes\": \"Producción del turno matutino, sin incidencias\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
