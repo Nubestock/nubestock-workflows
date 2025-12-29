@@ -275,6 +275,18 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "RESET PASWWORD AFTER ADMIN",
+					"id": "36731392-634edffa-c0be-4998-9d01-34fbe3032cb4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
 				}
 			],
 			"id": "36731392-65c89c5a-fe2b-4e88-99f8-5b23b0d53c4a"
