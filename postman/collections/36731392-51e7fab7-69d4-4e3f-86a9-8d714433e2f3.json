@@ -46,7 +46,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"email\": \"admin@nubestock.com\",\n  \"password\": \"Admin123456\"\n}",
+							"raw": "{\n  \"email\": \"admin@nubestock.com\",\n  \"password\": \"Admin123456\"\n  /*\"email\": \"jeremy.leon.g@outlook.com\",\n  \"password\": \"Admin123JLE\"*/\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -273,6 +273,18 @@
 								"profile"
 							]
 						}
+					},
+					"response": []
+				},
+				{
+					"name": "RESET PASWWORD AFTER ADMIN",
+					"id": "36731392-634edffa-c0be-4998-9d01-34fbe3032cb4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
 					},
 					"response": []
 				}
@@ -2955,7 +2967,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"namerole\": \"Vendedor Actualizado\",\n  \"description\": \"Rol actualizado para vendedores\",\n  \"permissions\": [\"{{permission_id}}\"]\n}",
+							"raw": "{\n  \"namerole\": \"Administrator\",\n  \"description\": \"Administrador del sistema con todos los permisos\",\n  \"permissions\": [\n    \"7d61d0ab-936e-46cb-a74e-5417b7c438ac\",\n    \"aa025cff-ecfa-4efa-b617-9768dc1ac4a1\",\n    \"b8de06dd-0af2-4224-8b88-3e271a80289a\",\n    \"94d4a945-335d-4bf4-8488-9588e8669397\",\n    \"69e34883-bd41-4c1e-b6aa-b8dc78ec68e2\",\n    \"fce74bd3-acb8-4529-b0dd-9236fd8c3410\"\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -3001,6 +3013,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "36731392-856b0d26-9efe-45b9-9596-c253a6530814",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/roles/all",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"roles",
+								"all"
+							]
+						}
+					},
+					"response": []
 				}
 			],
 			"id": "36731392-57893a44-cd5c-4bee-b4fd-8abbce864535"
@@ -3019,7 +3062,8 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"value": "Bearer {{token}}",
+								"disabled": true
 							}
 						],
 						"url": {
@@ -3186,6 +3230,293 @@
 				}
 			],
 			"id": "36731392-b09b751a-76c9-42d4-bb1d-12cb336d3325"
+		},
+		{
+			"name": "ALERTS",
+			"item": [
+				{
+					"name": "GET ALERTS",
+					"id": "36731392-e9560aa2-2e24-488b-92a6-ddda7ccf6f5e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "GET ALERT BY ID",
+					"id": "36731392-485111d4-26c4-4d71-8f02-381e4ab3dcfc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "UPDATE ALERT",
+					"id": "36731392-09a08b7a-8c20-47b7-8840-248e397d496d",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-98b4cfe6-a98e-4d48-b993-c9af13678c47"
+		},
+		{
+			"name": "RECEIPES",
+			"item": [
+				{
+					"name": "GET PRODUCT RECIPES",
+					"id": "36731392-ddcd4c90-265f-4ae4-92de-00886cd3e060",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/recipes?productId={{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "{{product_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE RECIPE",
+					"id": "36731392-1afb2a1e-1753-48c4-829c-5e8f685b51f3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"idmaterial\": \"{{material_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/recipe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipe"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-9850c82e-6cea-41b0-9935-298d4a9f11cb"
+		},
+		{
+			"name": "REPORTS",
+			"item": [
+				{
+					"name": "DAILY SALES REPORT",
+					"id": "36731392-7e13b9e2-5a8a-4cb3-a51f-0704b66a1ccc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/daily?startDate=2025-12-01&endDate=2025-12-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"daily"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "SALES BY CLIENT REPORT",
+					"id": "36731392-f6a2551e-2805-42f4-9972-0c6793882ebc",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/by-client?startDate=2025-12-01&endDate=2025-12-31&limit=50",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"by-client"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DASHBOARD SUMMARY REPORT",
+					"id": "36731392-a9b66cfe-76b8-4bda-a2d2-45a4a65aef7b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/summary?startDate=2025-12-01&endDate=2025-12-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "TOP PRODUCT SALES REPORT",
+					"id": "36731392-73d0f392-31fe-4531-a970-0dfef22c24ad",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sales/reports/top-products?startDate=2025-12-01&endDate=2025-12-31&limit=20",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sales",
+								"reports",
+								"top-products"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "endDate",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "limit",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "36731392-c54e403d-cfd6-4a04-b40c-c5f113cad8d4"
 		}
 	],
 	"variable": [
