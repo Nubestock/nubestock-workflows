@@ -20,8 +20,8 @@
 									"if (pm.response.code === 200) {",
 									"    const response = pm.response.json();",
 									"    if (response.success && response.data && response.data.token) {",
-									"        pm.environment.set('token', response.data.token);",
-									"        pm.environment.set('user_id', response.data.user.iduser);",
+									"        pm.collectionVariables.set('token', response.data.token);",
+									"        pm.collectionVariables.set('user_id', response.data.user.id);",
 									"        console.log('Token guardado:', response.data.token);",
 									"    }",
 									"}"
@@ -309,7 +309,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/users?page=1&limit=10&search=&isactive=true",
+							"raw": "{{base_url}}/users?page=1&limit=10&search=&is_active=true",
 							"host": [
 								"{{base_url}}"
 							],
@@ -330,7 +330,7 @@
 									"value": ""
 								},
 								{
-									"key": "isactive",
+									"key": "is_active",
 									"value": "true"
 								}
 							]
@@ -385,7 +385,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nameuser\": \"Juan Pérez\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"password\": \"Password123\",\n  \"phone\": \"+593987654321\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"nameuser\": \"Juan Pérez\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"password\": \"Password123\",\n  \"phone\": \"+593987654321\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -424,7 +424,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nameuser\": \"Juan Pérez Actualizado\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"phone\": \"+593987654321\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"nameuser\": \"Juan Pérez Actualizado\",\n  \"email\": \"juan.perez@nubestock.com\",\n  \"phone\": \"+593987654321\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -492,7 +492,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/products?page=1&limit=10&search=&idcategory=&idorigin=",
+							"raw": "{{base_url}}/products?page=1&limit=10&search=&id_category=&id_origin=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -513,11 +513,11 @@
 									"value": ""
 								},
 								{
-									"key": "idcategory",
+									"key": "id_category",
 									"value": ""
 								},
 								{
-									"key": "idorigin",
+									"key": "id_origin",
 									"value": ""
 								}
 							]
@@ -572,7 +572,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"product_name\": \"Papitas Limón\",\n  \"idcategory\": \"{{category_id}}\",\n  \"idorigin\": \"{{origin_id}}\",\n  \"description\": \"Papitas sabor limón, paquete de 50g\",\n  \"sku\": \"PAP-LIM-001\",\n  \"unit_price\": 0.50,\n  \"current_stock\": 100,\n  \"minimum_stock\": 25\n}",
+							"raw": "{\n  \"name\": \"Papitas Limón\",\n  \"id_category\": \"{{category_id}}\",\n  \"id_origin\": \"{{origin_id}}\",\n  \"id_measure\": 1,\n  \"sku\": \"PAP-LIM-001\",\n  \"type\": \"PF\",\n  \"min_stock\": 25,\n  \"quantity\": 100\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -611,7 +611,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"product_name\": \"Papitas Limón Actualizado\",\n  \"description\": \"Papitas sabor limón mejorado, paquete de 50g\",\n  \"unit_price\": 0.55,\n  \"current_stock\": 120,\n  \"minimum_stock\": 30\n}",
+							"raw": "{\n  \"name\": \"Papitas Limón Actualizado\",\n  \"min_stock\": 30,\n  \"quantity\": 120\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -678,7 +678,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n    {\n      \"product_name\": \"Papitas Limón 150g\",\n      \"idcategory\": \"{{category_id}}\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor limón, paquete de 150g\",\n      \"sku\": \"PAP-LIM-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 100,\n      \"minimum_stock\": 25\n    },\n    {\n      \"product_name\": \"Papitas Queso 150g\",\n      \"idcategory\": \"{{category_id}}\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor queso, paquete de 150g\",\n      \"sku\": \"PAP-QUE-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 80,\n      \"minimum_stock\": 30\n    },\n    {\n      \"product_name\": \"Chifles Salados 70g\",\n      \"idorigin\": \"{{origin_id}}\",\n      \"description\": \"Chifles de plátano verde\",\n      \"sku\": \"CHI-SAL-070\",\n      \"unit_price\": 0.50,\n      \"current_stock\": 50,\n      \"minimum_stock\": 20\n    }\n  ]",
+							"raw": "[\n    {\n      \"product_name\": \"Papitas Limón 150g\",\n      \"id_category\": \"{{category_id}}\",\n      \"id_origin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor limón, paquete de 150g\",\n      \"sku\": \"PAP-LIM-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 100,\n      \"minimum_stock\": 25\n    },\n    {\n      \"product_name\": \"Papitas Queso 150g\",\n      \"id_category\": \"{{category_id}}\",\n      \"id_origin\": \"{{origin_id}}\",\n      \"description\": \"Papitas sabor queso, paquete de 150g\",\n      \"sku\": \"PAP-QUE-150\",\n      \"unit_price\": 0.75,\n      \"current_stock\": 80,\n      \"minimum_stock\": 30\n    },\n    {\n      \"product_name\": \"Chifles Salados 70g\",\n      \"id_origin\": \"{{origin_id}}\",\n      \"description\": \"Chifles de plátano verde\",\n      \"sku\": \"CHI-SAL-070\",\n      \"unit_price\": 0.50,\n      \"current_stock\": 50,\n      \"minimum_stock\": 20\n    }\n  ]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -693,6 +693,79 @@
 							"path": [
 								"products",
 								"bulk"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET PRODUCT RECIPES",
+					"id": "36731392-ddcd4c90-265f-4ae4-92de-00886cd3e060",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/products/recipes?productId={{product_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipes"
+							],
+							"query": [
+								{
+									"key": "productId",
+									"value": "{{product_id}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CREATE RECIPE",
+					"id": "36731392-1afb2a1e-1753-48c4-829c-5e8f685b51f3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id_product\": \"{{product_id}}\",\n  \"id_product\": \"{{material_id}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/products/recipe",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"products",
+								"recipe"
 							]
 						}
 					},
@@ -758,7 +831,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"operation_type\": \"in\",\n  \"quantity\": 50,\n  \"notes\": \"Entrada de stock\"\n}",
+							"raw": "{\n  \"id_product\": \"{{product_id}}\",\n  \"operation_type\": \"in\",\n  \"quantity\": 50,\n  \"notes\": \"Entrada de stock\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1026,7 +1099,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nameorigin\": \"Planta Quito\",\n  \"idfacility\": \"FAC-001\",\n  \"idprovince\": \"{{province_id}}\",\n  \"idcity\": \"{{city_id}}\"\n}",
+							"raw": "{\n  \"nameorigin\": \"Planta Quito\",\n  \"idfacility\": \"FAC-001\",\n  \"id_province\": \"{{province_id}}\",\n  \"id_city\": \"{{city_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1065,7 +1138,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"nameorigin\": \"Planta Quito Actualizada\",\n  \"idfacility\": \"FAC-001\",\n  \"idprovince\": \"{{province_id}}\",\n  \"idcity\": \"{{city_id}}\"\n}",
+							"raw": "{\n  \"nameorigin\": \"Planta Quito Actualizada\",\n  \"idfacility\": \"FAC-001\",\n  \"id_province\": \"{{province_id}}\",\n  \"id_city\": \"{{city_id}}\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1148,7 +1221,7 @@
 									"disabled": true
 								},
 								{
-									"key": "isactive",
+									"key": "is_active",
 									"value": "",
 									"description": "Filtrar por estado activo (true/false)",
 									"disabled": true
@@ -1207,7 +1280,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"client_name\": \"Distribuidora ABC\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"ruc_cedula\": \"1234567890123\",\n  \"email\": \"contacto@distribuidora.com\",\n  \"phone\": \"+593987654321\",\n  \"address\": \"Av. Principal 123\",\n  \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n  \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n  \"requires_credit\": true,\n  \"credit_limit\": 5000.00,\n  \"credit_days\": 30\n}",
+							"raw": "{\n  \"client_name\": \"Distribuidora ABC\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"ruc_cedula\": \"1234567890123\",\n  \"email\": \"contacto@distribuidora.com\",\n  \"phone\": \"+593987654321\",\n  \"address\": \"Av. Principal 123\",\n  \"id_province\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n  \"id_city\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n  \"requires_credit\": true,\n  \"credit_limit\": 5000.00,\n  \"credit_days\": 30\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1223,7 +1296,7 @@
 								"clients"
 							]
 						},
-						"description": "Crea un nuevo cliente. NOTA: El campo 'isactive' se establece automáticamente como 'true' y NO debe incluirse en el request. Los campos 'idprovince' e 'idcity' son UUIDs que deben existir en las tablas tb_mae_province y tb_mae_city respectivamente. Si 'requires_credit' es true, se recomienda incluir 'credit_limit' y 'credit_days'."
+						"description": "Crea un nuevo cliente. NOTA: El campo 'is_active' se establece automáticamente como 'true' y NO debe incluirse en el request. Los campos 'id_province' e 'id_city' son UUIDs que deben existir en las tablas tb_mae_province y tb_mae_city respectivamente. Si 'requires_credit' es true, se recomienda incluir 'credit_limit' y 'credit_days'."
 					},
 					"response": []
 				},
@@ -1247,7 +1320,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"client_name\": \"Distribuidora ABC Actualizada\",\n  \"business_name\": \"Distribuidora ABC S.A.\",\n  \"email\": \"nuevo@distribuidora.com\",\n  \"phone\": \"+593987654322\",\n  \"address\": \"Av. Principal 456\",\n  \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n  \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n  \"requires_credit\": true,\n  \"credit_limit\": 10000.00,\n  \"credit_days\": 45,\n  \"isactive\": true\n}",
+							"raw": "{\n  \"name\": \"Distribuidora ABC Actualizada\",\n  \"email\": \"nuevo@distribuidora.com\",\n  \"phone\": \"+593987654322\",\n  \"address\": \"Av. Principal 456\",\n  \"id_province\": 1,\n  \"id_city\": 1,\n  \"requires_credit\": true,\n  \"credit_limit\": 10000.00,\n  \"credit_days\": 45,\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1264,7 +1337,7 @@
 								"{{client_id}}"
 							]
 						},
-						"description": "Actualiza un cliente existente. Todos los campos son opcionales. El campo 'isactive' puede incluirse para cambiar el estado del cliente. Los campos 'idprovince' e 'idcity' son UUIDs que deben existir en las tablas correspondientes."
+						"description": "Actualiza un cliente existente. Todos los campos son opcionales. El campo 'is_active' puede incluirse para cambiar el estado del cliente. Los campos 'id_province' e 'id_city' son UUIDs que deben existir en las tablas correspondientes."
 					},
 					"response": []
 				},
@@ -1316,7 +1389,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "[\n  {\n    \"client_name\": \"Distribuidora ABC\",\n    \"business_name\": \"Distribuidora ABC S.A.\",\n    \"ruc_cedula\": \"1234567890123\",\n    \"email\": \"contacto@distribuidora.com\",\n    \"phone\": \"+593987654321\",\n    \"address\": \"Av. Principal 123\",\n    \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": true,\n    \"credit_limit\": 5000.00,\n    \"credit_days\": 30\n  },\n  {\n    \"client_name\": \"Distribuidora XYZ\",\n    \"business_name\": \"Distribuidora XYZ S.A.\",\n    \"ruc_cedula\": \"1234567890124\",\n    \"email\": \"contacto@xyz.com\",\n    \"phone\": \"+593987654322\",\n    \"address\": \"Av. Secundaria 456\",\n    \"idprovince\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"idcity\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": false\n  }\n]",
+							"raw": "[\n  {\n    \"client_name\": \"Distribuidora ABC\",\n    \"business_name\": \"Distribuidora ABC S.A.\",\n    \"ruc_cedula\": \"1234567890123\",\n    \"email\": \"contacto@distribuidora.com\",\n    \"phone\": \"+593987654321\",\n    \"address\": \"Av. Principal 123\",\n    \"id_province\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"id_city\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": true,\n    \"credit_limit\": 5000.00,\n    \"credit_days\": 30\n  },\n  {\n    \"client_name\": \"Distribuidora XYZ\",\n    \"business_name\": \"Distribuidora XYZ S.A.\",\n    \"ruc_cedula\": \"1234567890124\",\n    \"email\": \"contacto@xyz.com\",\n    \"phone\": \"+593987654322\",\n    \"address\": \"Av. Secundaria 456\",\n    \"id_province\": \"e8952442-00ae-4124-be5d-d16d71f637e2\",\n    \"id_city\": \"410fab07-133e-46d7-a159-fd99fa045c23\",\n    \"requires_credit\": false\n  }\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1333,7 +1406,7 @@
 								"bulk"
 							]
 						},
-						"description": "Crea o actualiza múltiples clientes en una sola operación. El identificador único es el RUC/Cédula. Si un cliente con el mismo RUC/Cédula ya existe, se actualizará. Si no existe, se creará. NOTA: El campo 'isactive' se establece automáticamente como 'true' para nuevos clientes y NO debe incluirse en el request. Los campos 'idprovince' e 'idcity' son UUIDs opcionales. Máximo 1000 clientes por carga."
+						"description": "Crea o actualiza múltiples clientes en una sola operación. El identificador único es el RUC/Cédula. Si un cliente con el mismo RUC/Cédula ya existe, se actualizará. Si no existe, se creará. NOTA: El campo 'is_active' se establece automáticamente como 'true' para nuevos clientes y NO debe incluirse en el request. Los campos 'id_province' e 'id_city' son UUIDs opcionales. Máximo 1000 clientes por carga."
 					},
 					"response": []
 				}
@@ -1385,7 +1458,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/locations/complete?idcountry=&idprovince=&idcity=",
+							"raw": "{{base_url}}/locations/complete?id_country=&id_province=&id_city=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1395,17 +1468,17 @@
 							],
 							"query": [
 								{
-									"key": "idcountry",
+									"key": "id_country",
 									"value": "",
 									"description": "Filtrar por ID de país (UUID)"
 								},
 								{
-									"key": "idprovince",
+									"key": "id_province",
 									"value": "",
 									"description": "Filtrar por ID de provincia (UUID)"
 								},
 								{
-									"key": "idcity",
+									"key": "id_city",
 									"value": "",
 									"description": "Filtrar por ID de ciudad (UUID)"
 								}
@@ -1458,7 +1531,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/locations/provinces?idcountry=",
+							"raw": "{{base_url}}/locations/provinces?id_country=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1468,7 +1541,7 @@
 							],
 							"query": [
 								{
-									"key": "idcountry",
+									"key": "id_country",
 									"value": "",
 									"description": "Filtrar provincias por ID de país (UUID, opcional)"
 								}
@@ -1493,7 +1566,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/locations/cities?idprovince=",
+							"raw": "{{base_url}}/locations/cities?id_province=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1503,7 +1576,7 @@
 							],
 							"query": [
 								{
-									"key": "idprovince",
+									"key": "id_province",
 									"value": "",
 									"description": "Filtrar ciudades por ID de provincia (UUID, opcional)"
 								}
@@ -1568,7 +1641,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"country_name\": \"Ecuador\",\n  \"country_code\": \"EC\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"country_name\": \"Ecuador\",\n  \"country_code\": \"EC\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1609,7 +1682,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"country_name\": \"Ecuador Actualizado\",\n  \"country_code\": \"EC\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"country_name\": \"Ecuador Actualizado\",\n  \"country_code\": \"EC\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1727,7 +1800,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"province_name\": \"Pichincha\",\n  \"province_code\": \"P\",\n  \"idcountry\": \"{{country_id}}\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"province_name\": \"Pichincha\",\n  \"province_code\": \"P\",\n  \"id_country\": \"{{country_id}}\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1744,7 +1817,7 @@
 								"provinces"
 							]
 						},
-						"description": "Crea una nueva provincia. El campo 'idcountry' es requerido y debe existir en la tabla de países."
+						"description": "Crea una nueva provincia. El campo 'id_country' es requerido y debe existir en la tabla de países."
 					},
 					"response": []
 				},
@@ -1768,7 +1841,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"province_name\": \"Pichincha Actualizado\",\n  \"province_code\": \"P\",\n  \"idcountry\": \"{{country_id}}\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"province_name\": \"Pichincha Actualizado\",\n  \"province_code\": \"P\",\n  \"id_country\": \"{{country_id}}\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1886,7 +1959,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"city_name\": \"Quito\",\n  \"city_code\": \"UIO\",\n  \"idprovince\": \"{{province_id}}\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"city_name\": \"Quito\",\n  \"city_code\": \"UIO\",\n  \"id_province\": \"{{province_id}}\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1903,7 +1976,7 @@
 								"cities"
 							]
 						},
-						"description": "Crea una nueva ciudad. El campo 'idprovince' es requerido y debe existir en la tabla de provincias."
+						"description": "Crea una nueva ciudad. El campo 'id_province' es requerido y debe existir en la tabla de provincias."
 					},
 					"response": []
 				},
@@ -1927,7 +2000,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"city_name\": \"Quito Actualizado\",\n  \"city_code\": \"UIO\",\n  \"idprovince\": \"{{province_id}}\",\n  \"isactive\": true\n}",
+							"raw": "{\n  \"city_name\": \"Quito Actualizado\",\n  \"city_code\": \"UIO\",\n  \"id_province\": \"{{province_id}}\",\n  \"is_active\": true\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2011,7 +2084,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/products/materials?type=&idorigin=",
+							"raw": "{{base_url}}/products/materials?type=&id_origin=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -2025,7 +2098,7 @@
 									"value": ""
 								},
 								{
-									"key": "idorigin",
+									"key": "id_origin",
 									"value": ""
 								}
 							]
@@ -2080,7 +2153,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"material_name\": \"Papas\",\n  \"material_code\": \"MAT-PAP-001\",\n  \"material_type\": \"raw\",\n  \"unit_of_measure\": \"kg\",\n  \"cost_per_unit\": 1.50,\n  \"minimum_stock\": 100,\n  \"idorigin\": \"{{origin_id}}\",\n  \"supplier\": \"Proveedor ABC\"\n}",
+							"raw": "{\n  \"material_name\": \"Papas\",\n  \"material_code\": \"MAT-PAP-001\",\n  \"material_type\": \"raw\",\n  \"unit_of_measure\": \"kg\",\n  \"cost_per_unit\": 1.50,\n  \"minimum_stock\": 100,\n  \"id_origin\": \"{{origin_id}}\",\n  \"supplier\": \"Proveedor ABC\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2120,7 +2193,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"material_name\": \"Papas Actualizadas\",\n  \"material_code\": \"MAT-PAP-001\",\n  \"material_type\": \"raw\",\n  \"unit_of_measure\": \"kg\",\n  \"cost_per_unit\": 1.75,\n  \"minimum_stock\": 120,\n  \"idorigin\": \"{{origin_id}}\",\n  \"supplier\": \"Proveedor XYZ\"\n}",
+							"raw": "{\n  \"name\": \"Papas Actualizadas\",\n  \"sku\": \"MAT-PAP-001\",\n  \"type\": \"MP\",\n  \"id_origin\": \"{{origin_id}}\",\n  \"id_measure\": 1,\n  \"min_stock\": 120,\n  \"quantity\": 0\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2188,7 +2261,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&idclient=&payment_status=",
+							"raw": "{{base_url}}/sales?page=1&limit=10&startDate=&endDate=&id_client=&payment_status=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -2213,11 +2286,11 @@
 									"value": ""
 								},
 								{
-									"key": "idclient",
+									"key": "id_client",
 									"value": ""
 								},
 								{
-									"key": "payment_status",
+									"key": "status",
 									"value": ""
 								}
 							]
@@ -2272,7 +2345,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idclient\": \"{{client_id}}\",\n  \"iduser\": \"{{user_id}}\",\n  \"sale_date\": \"2025-10-26\",\n  \"total_amount\": 15.50,\n  \"payment_method\": \"cash\",\n  \"payment_status\": \"paid\",\n  \"notes\": \"Venta al contado\",\n  \"details\": [\n    {\n      \"idfinal_product\": \"{{product_id}}\",\n      \"quantity\": 2,\n      \"unit_price\": 0.50,\n      \"subtotal\": 1.00\n    }\n  ]\n}",
+							"raw": "{\n  \"id_client\": \"{{client_id}}\",\n  \"id_user\": \"{{user_id}}\",\n  \"sale_date\": \"2025-10-26\",\n  \"total_amount\": 15.50,\n  \"payment_method\": \"cash\",\n  \"payment_status\": \"paid\",\n  \"notes\": \"Venta al contado\",\n  \"details\": [\n    {\n      \"id_product\": \"{{product_id}}\",\n      \"quantity\": 2,\n      \"unit_price\": 0.50,\n      \"subtotal\": 1.00\n    }\n  ]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2311,7 +2384,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"payment_status\": \"paid\",\n  \"notes\": \"Venta actualizada\"\n}",
+							"raw": "{\n  \"status\": \"paid\",\n  \"notes\": \"Venta actualizada\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2351,7 +2424,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"payment_status\": \"paid\",\n  \"payment_date\": \"2025-10-26\"\n}",
+							"raw": "{\n  \"status\": \"paid\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2513,7 +2586,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/production/daily?page=1&limit=10&startDate=&endDate=&iduser=&idfinal_product=",
+							"raw": "{{base_url}}/production/daily?page=1&limit=10&startDate=&endDate=&id_user=&id_product=",
 							"host": [
 								"{{base_url}}"
 							],
@@ -2539,11 +2612,11 @@
 									"value": ""
 								},
 								{
-									"key": "iduser",
+									"key": "id_user",
 									"value": ""
 								},
 								{
-									"key": "idfinal_product",
+									"key": "id_product",
 									"value": ""
 								}
 							]
@@ -2571,7 +2644,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idfinal_product\": \"{{product_id}}\",\n  \"iduser\": \"{{user_id}}\",\n \"production_date\": \"2025-12-11T10:00:00.000Z\",\n    \"quantity_produced\": 40,\n    \"unit_of_measure\": \"unidades\",\n    \"notes\": \"Producción del turno matutino, sin incidencias\"\n}",
+							"raw": "{\n  \"id_product\": \"{{product_id}}\",\n  \"id_user\": \"{{user_id}}\",\n  \"production_date\": \"2025-10-26\",\n  \"quantity_produced\": 100,\n  \"quality_control\": \"passed\",\n  \"notes\": \"Producción normal\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2729,7 +2802,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"idmaterial\": \"{{material_id}}\",\n  \"transaction_type\": \"in\",\n  \"quantity\": 50,\n  \"unit_cost\": 0.25,\n  \"total_cost\": 12.50,\n  \"transaction_date\": \"2025-10-26\",\n  \"notes\": \"Compra de material\"\n}",
+							"raw": "{\n  \"id_product\": \"{{material_id}}\",\n  \"transaction_type\": \"in\",\n  \"quantity\": 50,\n  \"unit_cost\": 0.25,\n  \"total_cost\": 12.50,\n  \"transaction_date\": \"2025-10-26\",\n  \"notes\": \"Compra de material\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
