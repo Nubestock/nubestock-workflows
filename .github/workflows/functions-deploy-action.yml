@@ -40,6 +40,7 @@ jobs:
       - name: Checkout Backend Repository
         uses: actions/checkout@v4
         with:
+          repository: ${{ github.repository }}
           path: backend
 
       - name: Setup Node.js ${{ env.NODE_VERSION }}
@@ -72,6 +73,12 @@ jobs:
       name: ${{ inputs.environment }}
 
     steps:
+      - name: Checkout Backend Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          path: backend
+
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
@@ -122,10 +129,14 @@ jobs:
         run: |
           echo "🔄 Sincronizando variables dinámicas desde .env.template..."
 
-          TEMPLATE_FILE="backend-deploy/.env.template"
+          TEMPLATE_FILE="backend/.env.template"
 
           if [ ! -f "$TEMPLATE_FILE" ]; then
-            echo "❌ No se encontró $TEMPLATE_FILE"
+            TEMPLATE_FILE="backend-deploy/.env.template"
+          fi
+
+          if [ ! -f "$TEMPLATE_FILE" ]; then
+            echo "❌ No se encontró $TEMPLATE_FILE (ni en backend ni en backend-deploy)"
             exit 1
           fi
 
