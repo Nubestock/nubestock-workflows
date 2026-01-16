@@ -80,14 +80,6 @@ jobs:
       - name: Unzip artifact
         run: unzip release.zip -d backend-deploy
 
-      # 👇 CLAVE: checkout del repo de workflows (donde vive .env.template)
-      - name: Checkout nubestock-workflows
-        uses: actions/checkout@v4
-        with:
-          repository: Nubestock/nubestock-workflows
-          ref: master
-          path: workflows
-
       - name: Login to Azure
         shell: bash
         run: |
@@ -130,7 +122,7 @@ jobs:
         run: |
           echo "🔄 Sincronizando variables dinámicas desde .env.template..."
 
-          TEMPLATE_FILE="workflows/.env.template"
+          TEMPLATE_FILE="backend-deploy/.env.template"
 
           if [ ! -f "$TEMPLATE_FILE" ]; then
             echo "❌ No se encontró $TEMPLATE_FILE"
