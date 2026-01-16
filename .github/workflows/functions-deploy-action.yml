@@ -25,16 +25,6 @@ on:
         required: true
       AZ_RESOURCE_GROUP:
         required: true
-      DATABASE_HOSTNAME:
-        required: true
-      DATABASE_PORT:
-        required: true
-      DATABASE_USERNAME:
-        required: true
-      DATABASE_PASSWORD:
-        required: true
-      DATABASE_NAME:
-        required: true
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'backend-deploy'
@@ -102,45 +92,66 @@ jobs:
 
       - name: Validar existencia del Function App
         run: |
-          echo "🔍 Validando existencia del Function App..."
+          echo "Validando existencia del Function App..."
 
           FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
           RESOURCE_GROUP="${{ secrets.AZ_RESOURCE_GROUP }}"
-
-          echo "📦 Resource Group : $RESOURCE_GROUP"
-          echo "⚡ Function App   : $FUNCTION_APP_NAME"
-          echo ""
 
           if az functionapp show \
               --name "$FUNCTION_APP_NAME" \
               --resource-group "$RESOURCE_GROUP" \
               &>/dev/null; then
-            echo "✅ Function App encontrado. Continuando despliegue."
+            echo "Function App encontrado. Continuando despliegue."
           else
             echo ""
-            echo "❌ ERROR CRÍTICO"
+            echo "ERROR"
             echo "--------------------------------------------------"
-            echo "❌ El Function App '$FUNCTION_APP_NAME' NO existe"
-            echo "❌ Resource Group: $RESOURCE_GROUP"
+            echo "El Function App '$FUNCTION_APP_NAME' NO existe"
+            echo "Resource Group: $RESOURCE_GROUP"
             echo ""
-            echo "👉 Este workflow NO crea infraestructura."
-            echo "👉 Crea el Function App previamente usando ARM/Bicep."
-            echo "⛔ Abortando despliegue."
+            echo "Este workflow NO crea infraestructura."
+            echo "Crea el Function App previamente usando ARM/Bicep."
+            echo "Abortando despliegue."
             exit 1
           fi
 
-      - name: Sincronizar Application Settings
-        run: |
-          az functionapp config appsettings set \
-            --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
-            --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
-            --settings \
-              DATABASE_HOSTNAME="${{ secrets.DATABASE_HOSTNAME }}" \
-              DATABASE_PORT="${{ secrets.DATABASE_PORT }}" \
-              DATABASE_USERNAME="${{ secrets.DATABASE_USERNAME }}" \
-              DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
-              DATABASE_NAME="${{ secrets.DATABASE_NAME }}"
-
+          - name: Sincronizar Application Settings desde .env.template
+          shell: bash
+          run: |
+            echo "Sincronizando variables dinámicas desde .env.template..."
+        
+            TEMPLATE_FILE="backend/.env.template"
+        
+            if [ ! -f "$TEMPLATE_FILE" ]; then
+              echo "No se encontró $TEMPLATE_FILE. Abortando."
+              exit 1
+            fi
+        
+            SETTINGS=""
+        
+            while IFS= read -r VAR || [ -n "$VAR" ]; do
+              # Ignorar líneas vacías o comentarios
+              [[ -z "$VAR" || "$VAR" == \#* ]] && continue
+        
+              # Obtener valor desde variables de entorno (secrets)
+              VALUE="${!VAR}"
+        
+              if [ -z "$VALUE" ]; then
+                echo "WARNING: Secret '$VAR' no está definido en este environment (se omite)"
+              else
+                SETTINGS="$SETTINGS $VAR=$VALUE"
+              fi
+            done < "$TEMPLATE_FILE"
+        
+            if [ -n "$SETTINGS" ]; then
+              az functionapp config appsettings set \
+                --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
+                --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
+                --settings $SETTINGS
+            else
+              echo "No hay variables para sincronizar."
+            fi
+        
       - name: Deploy Azure Function
         uses: Azure/functions-action@v1
         with:
