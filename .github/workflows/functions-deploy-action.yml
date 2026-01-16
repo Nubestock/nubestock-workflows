@@ -4,14 +4,14 @@ on:
   workflow_call:
     inputs:
       environment:
-        description: 'Environment a desplegar (NUBESTOCK_DEV, NUBESTOCK_UAT, NUBESTOCK_PRD)'
+        description: "Environment a desplegar (NUBESTOCK_DEV, NUBESTOCK_UAT, NUBESTOCK_PRD)"
         required: true
         type: string
       node_version:
-        description: 'Versión de Node.js'
+        description: "Versión de Node.js"
         required: false
         type: string
-        default: '22'
+        default: "22"
     secrets:
       AZ_CLIENT_ID:
         required: true
@@ -27,7 +27,7 @@ on:
         required: true
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: 'backend-deploy'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: backend-deploy
   NODE_VERSION: ${{ inputs.node_version }}
 
 jobs:
@@ -80,7 +80,16 @@ jobs:
       - name: Unzip artifact
         run: unzip release.zip -d backend-deploy
 
+      # 👇 CLAVE: checkout del repo de workflows (donde vive .env.template)
+      - name: Checkout nubestock-workflows
+        uses: actions/checkout@v4
+        with:
+          repository: Nubestock/nubestock-workflows
+          ref: master
+          path: workflows
+
       - name: Login to Azure
+        shell: bash
         run: |
           az login --service-principal \
             --username "${{ secrets.AZ_CLIENT_ID }}" \
@@ -91,67 +100,72 @@ jobs:
           az account set --subscription "${{ secrets.AZ_SUBSCRIPTION_ID }}"
 
       - name: Validar existencia del Function App
+        shell: bash
         run: |
-          echo "Validando existencia del Function App..."
+          echo "🔍 Validando existencia del Function App..."
 
           FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
           RESOURCE_GROUP="${{ secrets.AZ_RESOURCE_GROUP }}"
 
           if az functionapp show \
-              --name "$FUNCTION_APP_NAME" \
-              --resource-group "$RESOURCE_GROUP" \
-              &>/dev/null; then
-            echo "Function App encontrado. Continuando despliegue."
+            --name "$FUNCTION_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            &>/dev/null; then
+            echo "✅ Function App encontrado. Continuando despliegue."
           else
             echo ""
-            echo "ERROR"
-            echo "--------------------------------------------------"
-            echo "El Function App '$FUNCTION_APP_NAME' NO existe"
-            echo "Resource Group: $RESOURCE_GROUP"
+            echo "❌ ERROR CRÍTICO"
+            echo "---------------------------------------------"
+            echo "❌ El Function App '$FUNCTION_APP_NAME' NO existe"
+            echo "❌ Resource Group: $RESOURCE_GROUP"
             echo ""
-            echo "Este workflow NO crea infraestructura."
-            echo "Crea el Function App previamente usando ARM/Bicep."
-            echo "Abortando despliegue."
+            echo "👉 Este workflow NO crea infraestructura"
+            echo "👉 Crea el Function App previamente (ARM/Bicep)"
+            echo "⛔ Abortando despliegue"
             exit 1
           fi
 
-          - name: Sincronizar Application Settings desde .env.template
-          shell: bash
-          run: |
-            echo "Sincronizando variables dinámicas desde .env.template..."
-        
-            TEMPLATE_FILE="backend/.env.template"
-        
-            if [ ! -f "$TEMPLATE_FILE" ]; then
-              echo "No se encontró $TEMPLATE_FILE. Abortando."
-              exit 1
-            fi
-        
-            SETTINGS=""
-        
-            while IFS= read -r VAR || [ -n "$VAR" ]; do
-              # Ignorar líneas vacías o comentarios
-              [[ -z "$VAR" || "$VAR" == \#* ]] && continue
-        
-              # Obtener valor desde variables de entorno (secrets)
-              VALUE="${!VAR}"
-        
-              if [ -z "$VALUE" ]; then
-                echo "WARNING: Secret '$VAR' no está definido en este environment (se omite)"
-              else
-                SETTINGS="$SETTINGS $VAR=$VALUE"
-              fi
-            done < "$TEMPLATE_FILE"
-        
-            if [ -n "$SETTINGS" ]; then
-              az functionapp config appsettings set \
-                --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
-                --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
-                --settings $SETTINGS
+      - name: Sincronizar Application Settings desde .env.template
+        shell: bash
+        run: |
+          echo "🔄 Sincronizando variables dinámicas desde .env.template..."
+
+          TEMPLATE_FILE="workflows/.env.template"
+
+          if [ ! -f "$TEMPLATE_FILE" ]; then
+            echo "❌ No se encontró $TEMPLATE_FILE"
+            exit 1
+          fi
+
+          SETTINGS=()
+
+          while IFS= read -r VAR || [ -n "$VAR" ]; do
+            [[ -z "$VAR" || "$VAR" == \#* ]] && continue
+
+            VALUE="${!VAR}"
+
+            if [ -n "$VALUE" ]; then
+              SETTINGS+=("$VAR=$VALUE")
             else
-              echo "No hay variables para sincronizar."
+              echo "⚠️ Variable '$VAR' no definida (omitida)"
             fi
-        
+          done < "$TEMPLATE_FILE"
+
+          if [ ${#SETTINGS[@]} -eq 0 ]; then
+            echo "ℹ️ No hay variables para sincronizar"
+            exit 0
+          fi
+
+          echo "📦 Variables sincronizadas:"
+          for S in "${SETTINGS[@]}"; do
+            echo " - ${S%%=*}"
+          done
+
+          az functionapp config appsettings set \
+            --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
+            --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
+            --settings "${SETTINGS[@]}"
+
       - name: Deploy Azure Function
         uses: Azure/functions-action@v1
         with:
