@@ -12,14 +12,6 @@ on:
         required: false
         type: string
         default: '22'
-      repo_url:
-        description: 'URL del repositorio (se obtiene automáticamente)'
-        required: false
-        type: string
-      branch:
-        description: 'Branch del repositorio (se obtiene automáticamente)'
-        required: false
-        type: string
     secrets:
       AZ_CLIENT_ID:
         required: true
@@ -33,10 +25,6 @@ on:
         required: true
       AZ_RESOURCE_GROUP:
         required: true
-      AZ_LOCATION:
-        required: false
-      AZ_APP_SERVICE_PLAN:
-        required: false
       DATABASE_HOSTNAME:
         required: true
       DATABASE_PORT:
@@ -59,29 +47,27 @@ jobs:
       contents: read
 
     steps:
-      - name: 'Checkout Backend Repository'
+      - name: Checkout Backend Repository
         uses: actions/checkout@v4
         with:
           path: backend
 
-      - name: Setup Node ${{ env.NODE_VERSION }} Environment
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Resolve Project Dependencies Using Npm'
-        shell: bash
+      - name: Install dependencies & build
         working-directory: ./backend
         run: |
           npm install
           npm run build --if-present
 
-      - name: Zip artifact for deployment
-        shell: bash
+      - name: Zip artifact
         working-directory: ./backend
         run: zip -r ../release.zip ./*
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: node-app
@@ -94,48 +80,15 @@ jobs:
       contents: read
     environment:
       name: ${{ inputs.environment }}
+
     steps:
-      - name: Download artifact from build job
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: node-app
 
-      - name: Unzip artifact for deployment
+      - name: Unzip artifact
         run: unzip release.zip -d backend-deploy
-
-      - name: List ZIP contents
-        run: unzip -l release.zip
-
-      - name: Checkout nubestock-workflows for ARM templates
-        uses: actions/checkout@v4
-        with:
-          repository: Nubestock/nubestock-workflows
-          path: nubestock-workflows
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verificar Secrets del Environment
-        run: |
-          # Verificar que todas las variables están definidas ANTES de hacer login
-          echo "🔍 Verificando variables del environment: ${{ inputs.environment }}"
-          
-          # Secrets de Azure (Autenticación) - Verificar primero porque se necesitan para el login
-          if [ -z "${{ secrets.AZ_CLIENT_ID }}" ]; then echo "❌ ERROR: La variable AZ_CLIENT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_CLIENT_ID detectada correctamente."; fi
-          if [ -z "${{ secrets.AZ_CLIENT_SECRET }}" ]; then echo "❌ ERROR: La variable AZ_CLIENT_SECRET no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_CLIENT_SECRET detectada correctamente."; fi
-          if [ -z "${{ secrets.AZ_TENANT_ID }}" ]; then echo "❌ ERROR: La variable AZ_TENANT_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_TENANT_ID detectada correctamente."; fi
-          if [ -z "${{ secrets.AZ_SUBSCRIPTION_ID }}" ]; then echo "❌ ERROR: La variable AZ_SUBSCRIPTION_ID no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_SUBSCRIPTION_ID detectada correctamente."; fi
-          
-          # Secrets de Azure (Recursos)
-          if [ -z "${{ secrets.AZ_FUNCTION_APP_NAME }}" ]; then echo "❌ ERROR: La variable AZ_FUNCTION_APP_NAME no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_FUNCTION_APP_NAME detectada correctamente."; fi
-          if [ -z "${{ secrets.AZ_RESOURCE_GROUP }}" ]; then echo "❌ ERROR: La variable AZ_RESOURCE_GROUP no está definida. Abortando despliegue."; exit 1; else echo "✅ AZ_RESOURCE_GROUP detectada correctamente."; fi
-          
-          # Secrets de Base de Datos
-          if [ -z "${{ secrets.DATABASE_HOSTNAME }}" ]; then echo "❌ ERROR: La variable DATABASE_HOSTNAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_HOSTNAME detectada correctamente."; fi
-          if [ -z "${{ secrets.DATABASE_PORT }}" ]; then echo "❌ ERROR: La variable DATABASE_PORT no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_PORT detectada correctamente."; fi
-          if [ -z "${{ secrets.DATABASE_USERNAME }}" ]; then echo "❌ ERROR: La variable DATABASE_USERNAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_USERNAME detectada correctamente."; fi
-          if [ -z "${{ secrets.DATABASE_PASSWORD }}" ]; then echo "❌ ERROR: La variable DATABASE_PASSWORD no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_PASSWORD detectada correctamente."; fi
-          if [ -z "${{ secrets.DATABASE_NAME }}" ]; then echo "❌ ERROR: La variable DATABASE_NAME no está definida. Abortando despliegue."; exit 1; else echo "✅ DATABASE_NAME detectada correctamente."; fi
-          
-          echo "✅ Todos los secrets están presentes. Procediendo con el login a Azure..."
 
       - name: Login to Azure
         run: |
@@ -144,147 +97,43 @@ jobs:
             --password "${{ secrets.AZ_CLIENT_SECRET }}" \
             --tenant "${{ secrets.AZ_TENANT_ID }}" \
             --output none
-          
+
           az account set --subscription "${{ secrets.AZ_SUBSCRIPTION_ID }}"
 
-      - name: Verificar y Crear Recursos de Azure
+      - name: Validar existencia del Function App
         run: |
-          echo "🔍 Verificando recursos de Azure..."
-          echo "Resource Group: ${{ secrets.AZ_RESOURCE_GROUP }}"
-          echo "Function App Name: ${{ secrets.AZ_FUNCTION_APP_NAME }}"
-          echo ""
-          
-          # Verificar o crear Resource Group
-          echo "📋 Verificando Resource Group..."
-          if az group show --name "${{ secrets.AZ_RESOURCE_GROUP }}" &>/dev/null; then
-            echo "✅ Resource Group encontrado"
-            LOCATION=$(az group show --name "${{ secrets.AZ_RESOURCE_GROUP }}" --query location -o tsv)
-            echo "📍 Ubicación del Resource Group: $LOCATION"
-          else
-            echo "⚠️ Resource Group no encontrado. Creando nuevo Resource Group en East US..."
-            az group create \
-              --name "${{ secrets.AZ_RESOURCE_GROUP }}" \
-              --location "eastus"
-            LOCATION="eastus"
-            echo "✅ Resource Group creado exitosamente en East US"
-          fi
-          
-          # Variables
+          echo "🔍 Validando existencia del Function App..."
+
           FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
           RESOURCE_GROUP="${{ secrets.AZ_RESOURCE_GROUP }}"
-          
-          # Determinar ubicación (por defecto: eastus, o usar la del RG si existe, o el secret)
-          if [ -n "${{ secrets.AZ_LOCATION }}" ]; then
-            LOCATION="${{ secrets.AZ_LOCATION }}"
-          elif [ -n "$LOCATION" ]; then
-            # Ya está definida desde el Resource Group
-            LOCATION="$LOCATION"
-          else
-            # Por defecto: East US (gratis)
-            LOCATION="eastus"
-          fi
-          
-          echo "📍 Ubicación a usar: $LOCATION"
-          
-          # Verificar o crear App Service Plan
-          APP_SERVICE_PLAN_NAME="${{ secrets.AZ_APP_SERVICE_PLAN }}"
-          if [ -z "$APP_SERVICE_PLAN_NAME" ]; then
-            APP_SERVICE_PLAN_NAME="${FUNCTION_APP_NAME}-plan"
-          fi
-          
-          echo ""
-          echo "📋 Verificando App Service Plan: $APP_SERVICE_PLAN_NAME"
-          if az appservice plan show --name "$APP_SERVICE_PLAN_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
-            echo "✅ App Service Plan encontrado"
-          else
-            echo "⚠️ App Service Plan no encontrado. Creando nuevo plan (FREE tier)..."
-            az appservice plan create \
-              --name "$APP_SERVICE_PLAN_NAME" \
-              --resource-group "$RESOURCE_GROUP" \
-              --location "$LOCATION" \
-              --sku FREE \
-              --is-linux
-            echo "✅ App Service Plan creado exitosamente (FREE tier)"
-          fi
-          
-          # Verificar que el Function App existe
-          echo ""
-          echo "🔍 Verificando Function App..."
-          if az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" &>/dev/null; then
-            echo "✅ Function App encontrado - no es necesario crearlo"
-          else
-            echo "⚠️ Function App no encontrado. Se creará usando ARM template."
-            
-            # Obtener información del repositorio
-            if [ -n "${{ inputs.repo_url }}" ]; then
-              REPO_URL="${{ inputs.repo_url }}"
-            else
-              REPO_URL="https://github.com/${{ github.repository }}"
-            fi
-            
-            if [ -n "${{ inputs.branch }}" ]; then
-              BRANCH="${{ inputs.branch }}"
-            else
-              BRANCH="${{ github.ref_name }}"
-            fi
-            
-            # Leer parámetros base desde el template y actualizar valores dinámicos
-            echo "📄 Preparando parámetros para ARM template..."
-            
-            # Leer el archivo de parámetros base y actualizar valores dinámicos usando jq
-            PARAMS_FILE="./nubestock-workflows/.github/arm-templates/parameters.json"
-            TEMP_PARAMS="/tmp/parameters.json"
-            
-            # Copiar el archivo base
-            cp "$PARAMS_FILE" "$TEMP_PARAMS"
-            
-            # Actualizar valores dinámicos usando jq
-            jq --arg subId "${{ secrets.AZ_SUBSCRIPTION_ID }}" \
-               --arg name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
-               --arg location "$LOCATION" \
-               --arg repoUrl "$REPO_URL" \
-               --arg branch "$BRANCH" \
-               --arg resourceGroup "$RESOURCE_GROUP" \
-               --arg hostingPlan "$APP_SERVICE_PLAN_NAME" \
-               '.parameters.subscriptionId.value = $subId |
-                .parameters.name.value = $name |
-                .parameters.location.value = $location |
-                .parameters.repoUrl.value = $repoUrl |
-                .parameters.branch.value = $branch |
-                .parameters.serverFarmResourceGroup.value = $resourceGroup |
-                .parameters.hostingPlanName.value = $hostingPlan' \
-               "$TEMP_PARAMS" > "$TEMP_PARAMS.tmp" && mv "$TEMP_PARAMS.tmp" "$TEMP_PARAMS"
-            
-            # Desplegar ARM template
-            echo "🚀 Desplegando ARM template..."
-            az deployment group create \
-              --resource-group "$RESOURCE_GROUP" \
-              --template-file "./nubestock-workflows/.github/arm-templates/template.json" \
-              --parameters "@$TEMP_PARAMS"
-            
-            if [ $? -eq 0 ]; then
-              echo "✅ Function App creado exitosamente usando ARM template"
-            else
-              echo "❌ Error al desplegar ARM template"
-              exit 1
-            fi
-            
-            # Limpiar archivo temporal
-            rm -f "$TEMP_PARAMS"
-          fi
-          
-          # Mostrar información del Function App
-          echo ""
-          echo "📋 Información del Function App:"
-          az functionapp show --name "$FUNCTION_APP_NAME" --resource-group "$RESOURCE_GROUP" --query "{Name:name, State:state, Location:location, Runtime:siteConfig.linuxFxVersion}" -o table
 
-      - name: Sincronizar Application Settings desde GitHub Secrets a Azure Function
+          echo "📦 Resource Group : $RESOURCE_GROUP"
+          echo "⚡ Function App   : $FUNCTION_APP_NAME"
+          echo ""
+
+          if az functionapp show \
+              --name "$FUNCTION_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              &>/dev/null; then
+            echo "✅ Function App encontrado. Continuando despliegue."
+          else
+            echo ""
+            echo "❌ ERROR CRÍTICO"
+            echo "--------------------------------------------------"
+            echo "❌ El Function App '$FUNCTION_APP_NAME' NO existe"
+            echo "❌ Resource Group: $RESOURCE_GROUP"
+            echo ""
+            echo "👉 Este workflow NO crea infraestructura."
+            echo "👉 Crea el Function App previamente usando ARM/Bicep."
+            echo "⛔ Abortando despliegue."
+            exit 1
+          fi
+
+      - name: Sincronizar Application Settings
         run: |
-          echo "✅ Todas las variables necesarias están presentes. Procediendo a sincronizar..."
-
           az functionapp config appsettings set \
-            --name '${{ secrets.AZ_FUNCTION_APP_NAME }}' \
-            --resource-group '${{ secrets.AZ_RESOURCE_GROUP }}' \
+            --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
+            --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
             --settings \
               DATABASE_HOSTNAME="${{ secrets.DATABASE_HOSTNAME }}" \
               DATABASE_PORT="${{ secrets.DATABASE_PORT }}" \
@@ -292,10 +141,9 @@ jobs:
               DATABASE_PASSWORD="${{ secrets.DATABASE_PASSWORD }}" \
               DATABASE_NAME="${{ secrets.DATABASE_NAME }}"
 
-      - name: 'Run Azure Functions Action'
+      - name: Deploy Azure Function
         uses: Azure/functions-action@v1
-        id: fa
         with:
           app-name: ${{ secrets.AZ_FUNCTION_APP_NAME }}
-          slot-name: 'Production'
+          slot-name: Production
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
