@@ -142,15 +142,22 @@ jobs:
 
           SETTINGS=()
 
-          while IFS= read -r VAR || [ -n "$VAR" ]; do
-            [[ -z "$VAR" || "$VAR" == \#* ]] && continue
+          while IFS= read -r LINE || [ -n "$LINE" ]; do
+            [[ -z "$LINE" || "$LINE" == \#* ]] && continue
 
-            VALUE="${!VAR}"
+            # Accept KEY or KEY=... formats; ignore values in template
+            KEY="${LINE#export }"
+            KEY="${KEY%%=*}"
+            KEY="${KEY%% *}"
+
+            [[ -z "$KEY" ]] && continue
+
+            VALUE="${!KEY}"
 
             if [ -n "$VALUE" ]; then
-              SETTINGS+=("$VAR=$VALUE")
+              SETTINGS+=("$KEY=$VALUE")
             else
-              echo "⚠️ Variable '$VAR' no definida (omitida)"
+              echo "⚠️ Variable '$KEY' no definida (omitida)"
             fi
           done < "$TEMPLATE_FILE"
 
