@@ -150,57 +150,83 @@ jobs:
             exit 1
           fi
 
-      - name: Sincronizar Application Settings desde .env.template
+      - name: Sincronizar Application Settings
         shell: bash
         run: |
-          echo "🔄 Sincronizando variables dinámicas desde .env.template..."
+          echo "🔄 Sincronizando variables dinámicas..."
 
-          TEMPLATE_FILE="backend/.env.template"
+          REQUIRED_VARS=(
+            "FUNCTIONS_WORKER_RUNTIME"
+            "FUNCTIONS_EXTENSION_VERSION"
+            "DATABASE_HOSTNAME"
+            "DATABASE_PORT"
+            "DATABASE_NAME"
+            "DATABASE_USERNAME"
+            "DATABASE_PASSWORD"
+            "DB_SSL"
+            "NODE_ENV"
+            "LOG_LEVEL"
+            "LOG_FORMAT"
+            "JWT_SECRET"
+            "EMAIL_ENABLED"
+            "AZURE_COMMUNICATION_CONNECTION_STRING"
+            "EMAIL_FROM"
+            "EMAIL_FROM_NAME"
+            "FRONTEND_URL"
+            "RESET_PASSWORD_PATH"
+            "PASSWORD_RESET_TOKEN_EXPIRY"
+            "BOOTSTRAP_KEY"
+            "AzureWebJobsStorage"
+            "NOTIFICATION_HUB_ENABLED"
+            "NOTIFICATION_HUB_CONNECTION_STRING"
+            "NOTIFICATION_HUB_NAME"
+            "NOTIFICATION_HUB_INTERNAL_KEY"
+          )
 
-          if [ ! -f "$TEMPLATE_FILE" ]; then
-            TEMPLATE_FILE="backend-deploy/.env.template"
-          fi
+          MISSING=()
+          for VAR in "${REQUIRED_VARS[@]}"; do
+            if [ -z "${!VAR}" ]; then
+              MISSING+=("$VAR")
+            fi
+          done
 
-          if [ ! -f "$TEMPLATE_FILE" ]; then
-            echo "❌ No se encontró $TEMPLATE_FILE (ni en backend ni en backend-deploy)"
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "❌ Faltan variables requeridas:"
+            for VAR in "${MISSING[@]}"; do
+              echo " - $VAR"
+            done
             exit 1
           fi
-
-          SETTINGS=()
-
-          while IFS= read -r LINE || [ -n "$LINE" ]; do
-            [[ -z "$LINE" || "$LINE" == \#* ]] && continue
-
-            # Accept KEY or KEY=... formats; ignore values in template
-            KEY="${LINE#export }"
-            KEY="${KEY%%=*}"
-            KEY="${KEY%% *}"
-
-            [[ -z "$KEY" ]] && continue
-
-            VALUE="${!KEY}"
-
-            if [ -n "$VALUE" ]; then
-              SETTINGS+=("$KEY=$VALUE")
-            else
-              echo "⚠️ Variable '$KEY' no definida (omitida)"
-            fi
-          done < "$TEMPLATE_FILE"
-
-          if [ ${#SETTINGS[@]} -eq 0 ]; then
-            echo "ℹ️ No hay variables para sincronizar"
-            exit 0
-          fi
-
-          echo "📦 Variables sincronizadas:"
-          for S in "${SETTINGS[@]}"; do
-            echo " - ${S%%=*}"
-          done
 
           az functionapp config appsettings set \
             --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
-            --settings "${SETTINGS[@]}"
+            --settings \
+              "FUNCTIONS_WORKER_RUNTIME=${FUNCTIONS_WORKER_RUNTIME}" \
+              "FUNCTIONS_EXTENSION_VERSION=${FUNCTIONS_EXTENSION_VERSION}" \
+              "DATABASE_HOSTNAME=${DATABASE_HOSTNAME}" \
+              "DATABASE_PORT=${DATABASE_PORT}" \
+              "DATABASE_NAME=${DATABASE_NAME}" \
+              "DATABASE_USERNAME=${DATABASE_USERNAME}" \
+              "DATABASE_PASSWORD=${DATABASE_PASSWORD}" \
+              "DB_SSL=${DB_SSL}" \
+              "NODE_ENV=${NODE_ENV}" \
+              "LOG_LEVEL=${LOG_LEVEL}" \
+              "LOG_FORMAT=${LOG_FORMAT}" \
+              "JWT_SECRET=${JWT_SECRET}" \
+              "EMAIL_ENABLED=${EMAIL_ENABLED}" \
+              "AZURE_COMMUNICATION_CONNECTION_STRING=${AZURE_COMMUNICATION_CONNECTION_STRING}" \
+              "EMAIL_FROM=${EMAIL_FROM}" \
+              "EMAIL_FROM_NAME=${EMAIL_FROM_NAME}" \
+              "FRONTEND_URL=${FRONTEND_URL}" \
+              "RESET_PASSWORD_PATH=${RESET_PASSWORD_PATH}" \
+              "PASSWORD_RESET_TOKEN_EXPIRY=${PASSWORD_RESET_TOKEN_EXPIRY}" \
+              "BOOTSTRAP_KEY=${BOOTSTRAP_KEY}" \
+              "AzureWebJobsStorage=${AzureWebJobsStorage}" \
+              "NOTIFICATION_HUB_ENABLED=${NOTIFICATION_HUB_ENABLED}" \
+              "NOTIFICATION_HUB_CONNECTION_STRING=${NOTIFICATION_HUB_CONNECTION_STRING}" \
+              "NOTIFICATION_HUB_NAME=${NOTIFICATION_HUB_NAME}" \
+              "NOTIFICATION_HUB_INTERNAL_KEY=${NOTIFICATION_HUB_INTERNAL_KEY}"
 
       - name: Deploy Azure Function
         uses: Azure/functions-action@v1
