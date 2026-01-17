@@ -155,6 +155,49 @@ jobs:
         run: |
           echo "🔄 Sincronizando variables dinámicas..."
 
+          REQUIRED_VARS=(
+            "FUNCTIONS_WORKER_RUNTIME"
+            "FUNCTIONS_EXTENSION_VERSION"
+            "DATABASE_HOSTNAME"
+            "DATABASE_PORT"
+            "DATABASE_NAME"
+            "DATABASE_USERNAME"
+            "DATABASE_PASSWORD"
+            "DB_SSL"
+            "NODE_ENV"
+            "LOG_LEVEL"
+            "LOG_FORMAT"
+            "JWT_SECRET"
+            "EMAIL_ENABLED"
+            "AZURE_COMMUNICATION_CONNECTION_STRING"
+            "EMAIL_FROM"
+            "EMAIL_FROM_NAME"
+            "FRONTEND_URL"
+            "RESET_PASSWORD_PATH"
+            "PASSWORD_RESET_TOKEN_EXPIRY"
+            "BOOTSTRAP_KEY"
+            "AzureWebJobsStorage"
+            "NOTIFICATION_HUB_ENABLED"
+            "NOTIFICATION_HUB_CONNECTION_STRING"
+            "NOTIFICATION_HUB_NAME"
+            "NOTIFICATION_HUB_INTERNAL_KEY"
+          )
+
+          MISSING=()
+          for VAR in "${REQUIRED_VARS[@]}"; do
+            if [ -z "${!VAR}" ]; then
+              MISSING+=("$VAR")
+            fi
+          done
+
+          if [ ${#MISSING[@]} -ne 0 ]; then
+            echo "❌ Faltan variables requeridas:"
+            for VAR in "${MISSING[@]}"; do
+              echo " - $VAR"
+            done
+            exit 1
+          fi
+
           az functionapp config appsettings set \
             --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
