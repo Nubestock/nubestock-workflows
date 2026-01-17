@@ -122,7 +122,6 @@ jobs:
     environment:
       name: ${{ inputs.environment }}
     env:
-      FUNCTIONS_WORKER_RUNTIME: ${{ secrets.FUNCTIONS_WORKER_RUNTIME }}
       FUNCTIONS_EXTENSION_VERSION: ${{ secrets.FUNCTIONS_EXTENSION_VERSION }}
       DATABASE_HOSTNAME: ${{ secrets.DATABASE_HOSTNAME }}
       DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
@@ -206,7 +205,6 @@ jobs:
           echo "🔄 Sincronizando variables dinámicas..."
 
           REQUIRED_VARS=(
-            "FUNCTIONS_WORKER_RUNTIME"
             "FUNCTIONS_EXTENSION_VERSION"
             "DATABASE_HOSTNAME"
             "DATABASE_PORT"
@@ -252,7 +250,6 @@ jobs:
             --name "${{ secrets.AZ_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZ_RESOURCE_GROUP }}" \
             --settings \
-              "FUNCTIONS_WORKER_RUNTIME=${FUNCTIONS_WORKER_RUNTIME}" \
               "FUNCTIONS_EXTENSION_VERSION=${FUNCTIONS_EXTENSION_VERSION}" \
               "DATABASE_HOSTNAME=${DATABASE_HOSTNAME}" \
               "DATABASE_PORT=${DATABASE_PORT}" \
