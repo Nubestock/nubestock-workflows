@@ -25,6 +25,56 @@ on:
         required: true
       AZ_RESOURCE_GROUP:
         required: true
+      FUNCTIONS_WORKER_RUNTIME:
+        required: true
+      FUNCTIONS_EXTENSION_VERSION:
+        required: true
+      DATABASE_HOSTNAME:
+        required: true
+      DATABASE_PORT:
+        required: true
+      DATABASE_NAME:
+        required: true
+      DATABASE_USERNAME:
+        required: true
+      DATABASE_PASSWORD:
+        required: true
+      DB_SSL:
+        required: true
+      NODE_ENV:
+        required: true
+      LOG_LEVEL:
+        required: true
+      LOG_FORMAT:
+        required: true
+      JWT_SECRET:
+        required: true
+      EMAIL_ENABLED:
+        required: true
+      AZURE_COMMUNICATION_CONNECTION_STRING:
+        required: true
+      EMAIL_FROM:
+        required: true
+      EMAIL_FROM_NAME:
+        required: true
+      FRONTEND_URL:
+        required: true
+      RESET_PASSWORD_PATH:
+        required: true
+      PASSWORD_RESET_TOKEN_EXPIRY:
+        required: true
+      BOOTSTRAP_KEY:
+        required: true
+      AzureWebJobsStorage:
+        required: true
+      NOTIFICATION_HUB_ENABLED:
+        required: true
+      NOTIFICATION_HUB_CONNECTION_STRING:
+        required: true
+      NOTIFICATION_HUB_NAME:
+        required: true
+      NOTIFICATION_HUB_INTERNAL_KEY:
+        required: true
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: backend-deploy
