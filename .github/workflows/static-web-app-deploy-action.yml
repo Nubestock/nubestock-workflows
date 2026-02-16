@@ -39,7 +39,6 @@ on:
       # Código para invocar el backend (?code=). Mismo valor que APP_KEY del backend.
       VITE_API_CODE:
         required: false
-
 env:
   NODE_VERSION: ${{ inputs.node_version }}
   APP_LOCATION: ${{ inputs.app_location }}
@@ -75,6 +74,27 @@ jobs:
           VITE_API_TIMEOUT: ${{ secrets.VITE_API_TIMEOUT }}
           VITE_API_CODE: ${{ secrets.VITE_API_CODE }}
         run: npm run build
+
+      - name: Generate staticwebapp.config.json (proxy al backend)
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: |
+          if [ -n "$VITE_API_BASE_URL" ]; then
+            cat > ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json << EOF
+          {
+            "routes": [
+              {
+                "route": "/api/*",
+                "rewrite": "${VITE_API_BASE_URL}/*"
+              }
+            ]
+          }
+          EOF
+            echo "✅ staticwebapp.config.json generado con backend: $VITE_API_BASE_URL"
+            cat ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json
+          else
+            echo "ℹ️ VITE_API_BASE_URL no configurado - no se genera proxy"
+          fi
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
