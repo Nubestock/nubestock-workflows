@@ -119,6 +119,54 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Wait for Sonar analysis
+        run: sleep 15
+
+      - name: Validate Sonar conditions
+        run: |
+          echo "Getting metrics for component: $SONAR_PROJECT_KEY"
+          METRICS=$(curl -s -u "$SONAR_TOKEN": \
+            "https://sonarcloud.io/api/measures/component?component=$SONAR_PROJECT_KEY&metricKeys=coverage,bugs,vulnerabilities")
+
+          COVERAGE=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"')
+          BUGS=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="bugs") | .value // "0"')
+          VULNERABILITIES=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="vulnerabilities") | .value // "0"')
+
+          COVERAGE=${COVERAGE:-0}
+          BUGS=${BUGS:-0}
+          VULNERABILITIES=${VULNERABILITIES:-0}
+
+          echo "Coverage: $COVERAGE%"
+          echo "Bugs: $BUGS"
+          echo "Vulnerabilities: $VULNERABILITIES"
+
+          FAIL=0
+
+          if (( $(echo "$COVERAGE < 90" | bc -l) )); then
+            echo "Coverage below 90%"
+            FAIL=1
+          fi
+
+          if [ "$BUGS" -gt 1 ]; then
+            echo "More than 1 bug detected"
+            FAIL=1
+          fi
+
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "Security vulnerabilities detected"
+            FAIL=1
+          fi
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo "Sonar validation failed"
+            exit 1
+          else
+            echo "Sonar validation passed"
+          fi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+
   build:
     name: Build
     runs-on: ubuntu-latest
