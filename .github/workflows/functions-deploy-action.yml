@@ -327,59 +327,72 @@ jobs:
           
           echo "📍 URL del healthcheck: ${HEALTHCHECK_URL}"
           
-          # Realizar petición con reintentos
+          # Realizar petición con reintentos (usar archivo temporal para no mezclar salida de curl con errores)
           MAX_RETRIES=3
           RETRY_DELAY=10
-          HTTP_STATUS=0
+          HTTP_STATUS=""
           RESPONSE_BODY=""
+          CURL_OK=false
+          BODY_FILE=$(mktemp)
+          trap "rm -f '$BODY_FILE'" EXIT
           
           for i in $(seq 1 $MAX_RETRIES); do
             echo "🔄 Intento $i de $MAX_RETRIES..."
             
-            HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "${HEALTHCHECK_URL}" \
+            CURL_STDERR=$(mktemp)
+            HTTP_STATUS=$(curl -s -w "%{http_code}" -o "$BODY_FILE" -X GET "${HEALTHCHECK_URL}" \
               -H "Content-Type: application/json" \
               --max-time 30 \
-              --retry 3 \
+              --retry 2 \
               --retry-delay 5 \
-              --fail-with-body 2>&1 || echo "CURL_ERROR")
+              --connect-timeout 15 \
+              2>"$CURL_STDERR") || true
+            CURL_EXIT=$?
+            RESPONSE_BODY=$(cat "$BODY_FILE" 2>/dev/null || echo "")
             
-            if [ "$HTTP_RESPONSE" = "CURL_ERROR" ] || [ -z "$HTTP_RESPONSE" ]; then
-              echo "❌ Error al realizar la petición HTTP"
-              if [ $i -lt $MAX_RETRIES ]; then
-                echo "⏳ Esperando ${RETRY_DELAY} segundos antes del siguiente intento..."
-                sleep $RETRY_DELAY
+            # Si curl falló por conexión, puede devolver vacío o 000
+            if [ -z "$HTTP_STATUS" ] || [ "$HTTP_STATUS" = "000" ]; then
+              echo "📊 No se pudo conectar (curl exit: ${CURL_EXIT})"
+              [ -s "$CURL_STDERR" ] && echo "   Detalle: $(cat "$CURL_STDERR")"
+              HTTP_STATUS="000"
+            else
+              echo "📊 Código HTTP: ${HTTP_STATUS}"
+            fi
+            rm -f "$CURL_STDERR"
+            
+            # Solo dígitos de 3 cifras = código HTTP válido
+            if echo "$HTTP_STATUS" | grep -qE '^[0-9]{3}$'; then
+              if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "503" ]; then
+                echo "✅ Función responde (HTTP ${HTTP_STATUS})"
+                CURL_OK=true
+                break
               fi
-              continue
             fi
             
-            HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n1)
-            RESPONSE_BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
-            
-            echo "📊 Código HTTP: ${HTTP_STATUS}"
-            
-            if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "503" ]; then
-              echo "✅ Función responde (HTTP ${HTTP_STATUS})"
-              break
-            else
-              echo "⚠️  Respuesta inesperada: HTTP ${HTTP_STATUS}"
-              if [ $i -lt $MAX_RETRIES ]; then
-                echo "⏳ Esperando ${RETRY_DELAY} segundos antes del siguiente intento..."
-                sleep $RETRY_DELAY
-              fi
+            echo "⚠️  No se pudo validar la función (HTTP ${HTTP_STATUS})"
+            if [ $i -lt $MAX_RETRIES ]; then
+              echo "⏳ Esperando ${RETRY_DELAY} segundos antes del siguiente intento..."
+              sleep $RETRY_DELAY
             fi
           done
           
           # Validar respuesta HTTP
-          if [ "$HTTP_STATUS" != "200" ] && [ "$HTTP_STATUS" != "503" ]; then
+          if [ "$CURL_OK" != "true" ]; then
             echo ""
             echo "❌ ERROR CRÍTICO"
             echo "---------------------------------------------"
-            echo "❌ La función no responde correctamente"
-            echo "❌ HTTP Status: ${HTTP_STATUS}"
+            echo "❌ No se pudo conectar al healthcheck de la función."
             echo "❌ URL: ${HEALTHCHECK_URL}"
             echo ""
-            echo "📄 Respuesta recibida:"
-            echo "${RESPONSE_BODY}"
+            echo "💡 Posibles causas:"
+            echo "  - La Function App no es accesible desde internet (red/firewall)"
+            echo "  - La función tarda más en arrancar (aumentar la espera previa)"
+            echo "  - La URL del Function App es incorrecta"
+            echo ""
+            if [ -n "$RESPONSE_BODY" ]; then
+              echo "📄 Respuesta recibida:"
+              echo "${RESPONSE_BODY}"
+            fi
             exit 1
           fi
           
