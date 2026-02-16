@@ -78,7 +78,7 @@ on:
       NOTIFICATION_HUB_INTERNAL_KEY:
         required: true
       SONAR_TOKEN:
-        required: true
+        required: false
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: backend-deploy
@@ -124,9 +124,10 @@ jobs:
 
       - name: Validate Sonar conditions
         run: |
-          echo "Getting metrics for component: $SONAR_PROJECT_KEY"
+          PROJECT_KEY=$(grep '^sonar.projectKey=' backend/sonar-project.properties | cut -d= -f2)
+          echo "Getting metrics for component: $PROJECT_KEY"
           METRICS=$(curl -s -u "$SONAR_TOKEN": \
-            "https://sonarcloud.io/api/measures/component?component=$SONAR_PROJECT_KEY&metricKeys=coverage,bugs,vulnerabilities")
+            "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=coverage,bugs,vulnerabilities")
 
           COVERAGE=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"')
           BUGS=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="bugs") | .value // "0"')
@@ -165,7 +166,6 @@ jobs:
           fi
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
 
   build:
     name: Build
