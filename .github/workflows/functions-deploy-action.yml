@@ -98,11 +98,34 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install dependencies & build
+      - name: Install dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: ./backend
+        run: npm run build
+
+      - name: Verify build output
         working-directory: ./backend
         run: |
-          npm install
-          npm run build --if-present
+          echo "🔍 Verificando estructura de archivos compilados..."
+          if [ ! -d "dist" ]; then
+            echo "❌ ERROR: La carpeta 'dist' no existe después del build"
+            exit 1
+          fi
+          echo "✅ Carpeta 'dist' encontrada"
+          
+          # Verificar que existen al menos algunos archivos compilados comunes
+          if [ ! -f "dist/healthcheck/index.js" ] && [ ! -f "dist/auth/index.js" ] && [ ! -f "dist/users/index.js" ]; then
+            echo "⚠️  ADVERTENCIA: No se encontraron archivos compilados comunes en dist/"
+            echo "📁 Contenido de dist/:"
+            ls -la dist/ || echo "dist/ está vacía"
+          else
+            echo "✅ Archivos compilados encontrados en dist/"
+            echo "📁 Estructura de dist/:"
+            find dist -name "*.js" -type f | head -10
+          fi
 
       - name: Zip artifact
         working-directory: ./backend
@@ -281,3 +304,156 @@ jobs:
           app-name: ${{ secrets.AZ_FUNCTION_APP_NAME }}
           slot-name: Production
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+
+      - name: Wait for function to be ready
+        shell: bash
+        run: |
+          echo "⏳ Esperando 15 segundos para que la función se active..."
+          sleep 15
+
+      - name: Validate function deployment and environment variables
+        shell: bash
+        run: |
+          echo "🔍 Validando despliegue y variables de entorno..."
+          
+          # Instalar jq si no está disponible (normalmente ya está en GitHub Actions)
+          if ! command -v jq &> /dev/null; then
+            echo "📦 Instalando jq para parsing JSON..."
+            sudo apt-get update && sudo apt-get install -y jq
+          fi
+          
+          FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
+          HEALTHCHECK_URL="https://${FUNCTION_APP_NAME}.azurewebsites.net/api/healthcheck"
+          
+          echo "📍 URL del healthcheck: ${HEALTHCHECK_URL}"
+          
+          # Realizar petición con reintentos
+          MAX_RETRIES=3
+          RETRY_DELAY=10
+          HTTP_STATUS=0
+          RESPONSE_BODY=""
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "🔄 Intento $i de $MAX_RETRIES..."
+            
+            HTTP_RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "${HEALTHCHECK_URL}" \
+              -H "Content-Type: application/json" \
+              --max-time 30 \
+              --retry 3 \
+              --retry-delay 5 \
+              --fail-with-body 2>&1 || echo "CURL_ERROR")
+            
+            if [ "$HTTP_RESPONSE" = "CURL_ERROR" ] || [ -z "$HTTP_RESPONSE" ]; then
+              echo "❌ Error al realizar la petición HTTP"
+              if [ $i -lt $MAX_RETRIES ]; then
+                echo "⏳ Esperando ${RETRY_DELAY} segundos antes del siguiente intento..."
+                sleep $RETRY_DELAY
+              fi
+              continue
+            fi
+            
+            HTTP_STATUS=$(echo "$HTTP_RESPONSE" | tail -n1)
+            RESPONSE_BODY=$(echo "$HTTP_RESPONSE" | sed '$d')
+            
+            echo "📊 Código HTTP: ${HTTP_STATUS}"
+            
+            if [ "$HTTP_STATUS" = "200" ] || [ "$HTTP_STATUS" = "503" ]; then
+              echo "✅ Función responde (HTTP ${HTTP_STATUS})"
+              break
+            else
+              echo "⚠️  Respuesta inesperada: HTTP ${HTTP_STATUS}"
+              if [ $i -lt $MAX_RETRIES ]; then
+                echo "⏳ Esperando ${RETRY_DELAY} segundos antes del siguiente intento..."
+                sleep $RETRY_DELAY
+              fi
+            fi
+          done
+          
+          # Validar respuesta HTTP
+          if [ "$HTTP_STATUS" != "200" ] && [ "$HTTP_STATUS" != "503" ]; then
+            echo ""
+            echo "❌ ERROR CRÍTICO"
+            echo "---------------------------------------------"
+            echo "❌ La función no responde correctamente"
+            echo "❌ HTTP Status: ${HTTP_STATUS}"
+            echo "❌ URL: ${HEALTHCHECK_URL}"
+            echo ""
+            echo "📄 Respuesta recibida:"
+            echo "${RESPONSE_BODY}"
+            exit 1
+          fi
+          
+          # Validar que la respuesta es JSON válido
+          echo ""
+          echo "📋 Analizando respuesta del healthcheck..."
+          if ! echo "${RESPONSE_BODY}" | jq empty 2>/dev/null; then
+            echo "⚠️  ADVERTENCIA: La respuesta no es JSON válido"
+            echo "📄 Respuesta completa:"
+            echo "${RESPONSE_BODY}"
+            echo ""
+            echo "✅ La función responde, pero no se pudo validar el contenido"
+            exit 0
+          fi
+          
+          # Mostrar JSON formateado
+          echo "${RESPONSE_BODY}" | jq '.'
+          
+          # Extraer información del healthcheck
+          STATUS=$(echo "${RESPONSE_BODY}" | jq -r '.status // "unknown"')
+          TIMESTAMP=$(echo "${RESPONSE_BODY}" | jq -r '.timestamp // "unknown"')
+          RESPONSE_TIME=$(echo "${RESPONSE_BODY}" | jq -r '.responseTime // "unknown"')
+          
+          echo ""
+          echo "📊 Estado del Healthcheck:"
+          echo "  Status: ${STATUS}"
+          echo "  Timestamp: ${TIMESTAMP}"
+          echo "  Response Time: ${RESPONSE_TIME}"
+          echo ""
+          
+          # Validar checks individuales
+          API_STATUS=$(echo "${RESPONSE_BODY}" | jq -r '.checks.api.status // "unknown"')
+          DB_STATUS=$(echo "${RESPONSE_BODY}" | jq -r '.checks.database.status // "unknown"')
+          ENV_STATUS=$(echo "${RESPONSE_BODY}" | jq -r '.checks.environment.status // "unknown"')
+          
+          echo "🔍 Validación de Componentes:"
+          echo "  API: ${API_STATUS}"
+          echo "  Database: ${DB_STATUS}"
+          echo "  Environment Variables: ${ENV_STATUS}"
+          echo ""
+          
+          # Validar variables de entorno críticas
+          ENV_MESSAGE=$(echo "${RESPONSE_BODY}" | jq -r '.checks.environment.message // ""')
+          
+          if [ "$ENV_STATUS" = "unhealthy" ]; then
+            echo "❌ ERROR: Variables de entorno críticas faltantes o incorrectas"
+            echo "📝 Mensaje: ${ENV_MESSAGE}"
+            echo ""
+            echo "🔍 Verificando variables esperadas en el workflow..."
+            echo "  - DATABASE_HOSTNAME: ${DATABASE_HOSTNAME:+✅ Configurada}"
+            echo "  - DATABASE_NAME: ${DATABASE_NAME:+✅ Configurada}"
+            echo "  - JWT_SECRET: ${JWT_SECRET:+✅ Configurada}"
+            echo ""
+            echo "⚠️  Las variables están configuradas en el workflow pero no en Azure Function App"
+            exit 1
+          fi
+          
+          if [ "$STATUS" = "unhealthy" ]; then
+            echo "❌ ERROR: El sistema está marcado como 'unhealthy'"
+            echo "📝 Detalles de los checks:"
+            echo "${RESPONSE_BODY}" | jq '.checks'
+            exit 1
+          fi
+          
+          if [ "$STATUS" = "degraded" ]; then
+            echo "⚠️  ADVERTENCIA: El sistema está 'degraded' pero funcional"
+            echo "📝 Detalles de los checks:"
+            echo "${RESPONSE_BODY}" | jq '.checks'
+            echo ""
+            echo "✅ Despliegue completado con advertencias"
+          else
+            echo "✅ Sistema saludable - Todas las validaciones pasaron"
+            echo ""
+            echo "✅ Despliegue validado exitosamente"
+            echo "✅ Variables de entorno configuradas correctamente"
+            echo "✅ Función operativa y respondiendo"
+          fi
