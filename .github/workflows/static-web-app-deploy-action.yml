@@ -90,10 +90,10 @@ jobs:
             ]
           }
           EOF
-            echo "✅ staticwebapp.config.json generado con backend: $VITE_API_BASE_URL"
+            echo "staticwebapp.config.json generado con backend: $VITE_API_BASE_URL"
             cat ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json
           else
-            echo "ℹ️ VITE_API_BASE_URL no configurado - no se genera proxy"
+            echo "VITE_API_BASE_URL no configurado - no se genera proxy"
           fi
 
       - name: Deploy to Azure Static Web Apps

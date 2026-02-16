@@ -111,21 +111,21 @@ jobs:
       - name: Verify build output
         working-directory: ./backend
         run: |
-          echo "🔍 Verificando estructura de archivos compilados..."
+          echo "Verificando estructura de archivos compilados..."
           if [ ! -d "dist" ]; then
-            echo "❌ ERROR: La carpeta 'dist' no existe después del build"
+            echo "ERROR: La carpeta 'dist' no existe después del build"
             exit 1
           fi
-          echo "✅ Carpeta 'dist' encontrada"
+          echo "Carpeta 'dist' encontrada"
           
           # Verificar que existen al menos algunos archivos compilados comunes
           if [ ! -f "dist/healthcheck/index.js" ] && [ ! -f "dist/auth/index.js" ] && [ ! -f "dist/users/index.js" ]; then
-            echo "⚠️  ADVERTENCIA: No se encontraron archivos compilados comunes en dist/"
-            echo "📁 Contenido de dist/:"
+            echo " ADVERTENCIA: No se encontraron archivos compilados comunes en dist/"
+            echo "Contenido de dist/:"
             ls -la dist/ || echo "dist/ está vacía"
           else
-            echo "✅ Archivos compilados encontrados en dist/"
-            echo "📁 Estructura de dist/:"
+            echo "Archivos compilados encontrados en dist/"
+            echo "Estructura de dist/:"
             find dist -name "*.js" -type f | head -10
           fi
 
@@ -202,7 +202,7 @@ jobs:
       - name: Validar existencia del Function App
         shell: bash
         run: |
-          echo "🔍 Validando existencia del Function App..."
+          echo "Validando existencia del Function App..."
 
           FUNCTION_APP_NAME="${{ secrets.AZ_FUNCTION_APP_NAME }}"
           RESOURCE_GROUP="${{ secrets.AZ_RESOURCE_GROUP }}"
@@ -211,13 +211,13 @@ jobs:
             --name "$FUNCTION_APP_NAME" \
             --resource-group "$RESOURCE_GROUP" \
             &>/dev/null; then
-            echo "✅ Function App encontrado. Continuando despliegue."
+            echo "Function App encontrado. Continuando despliegue."
           else
             echo ""
-            echo "❌ ERROR CRÍTICO"
+            echo "ERROR CRÍTICO"
             echo "---------------------------------------------"
-            echo "❌ El Function App '$FUNCTION_APP_NAME' NO existe"
-            echo "❌ Resource Group: $RESOURCE_GROUP"
+            echo "El Function App '$FUNCTION_APP_NAME' NO existe"
+            echo "Resource Group: $RESOURCE_GROUP"
             echo ""
             echo "👉 Este workflow NO crea infraestructura"
             echo "👉 Crea el Function App previamente (ARM/Bicep)"
@@ -228,7 +228,7 @@ jobs:
       - name: Sincronizar Application Settings
         shell: bash
         run: |
-          echo "🔄 Sincronizando variables dinámicas..."
+          echo "Sincronizando variables dinámicas..."
 
           REQUIRED_VARS=(
             "FUNCTIONS_EXTENSION_VERSION"
@@ -266,7 +266,7 @@ jobs:
           done
 
           if [ ${#MISSING[@]} -ne 0 ]; then
-            echo "❌ Faltan variables requeridas:"
+            echo "Faltan variables requeridas:"
             for VAR in "${MISSING[@]}"; do
               echo " - $VAR"
             done

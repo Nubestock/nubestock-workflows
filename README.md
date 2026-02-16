@@ -2,19 +2,19 @@
 
 Este repositorio contiene workflows reutilizables de GitHub Actions para desplegar aplicaciones de Nubestock a Azure.
 
-## 📦 Workflows Disponibles
+## Workflows Disponibles
 
 ### `functions-deploy-action.yml`
 
 Workflow reutilizable para desplegar Azure Functions con soporte para múltiples ambientes (DEV, UAT, PRD).
 
 **Características:**
-- ✅ Soporte para múltiples ambientes mediante GitHub Environments
-- ✅ Validación de secrets antes del despliegue
-- ✅ Sincronización automática de variables de entorno a Azure Function App
-- ✅ Build y deploy automatizado
+- Soporte para múltiples ambientes mediante GitHub Environments
+- Validación de secrets antes del despliegue
+- Sincronización automática de variables de entorno a Azure Function App
+- Build y deploy automatizado
 
-## 🚀 Uso Rápido
+## Uso Rápido
 
 ### 1. En tu repositorio del backend, crea `.github/workflows/deploy.yml`:
 
@@ -60,7 +60,7 @@ Ver [ENVIRONMENTS_SETUP.md](.github/ENVIRONMENTS_SETUP.md) para más detalles.
 - [Guía de Configuración de Environments](.github/ENVIRONMENTS_SETUP.md) - Configuración detallada de secrets y environments
 - [Ejemplo de Workflow](.github/workflows/example-backend-deploy.yml) - Ejemplo completo de cómo usar el workflow
 
-## 🔐 Secrets Requeridos
+## Secrets Requeridos
 
 Cada environment debe tener los siguientes secrets configurados:
 
@@ -80,7 +80,7 @@ Cada environment debe tener los siguientes secrets configurados:
 - `DATABASE_PASSWORD`
 - `DATABASE_NAME`
 
-## 🔄 Mapeo de Ramas a Environments
+## Mapeo de Ramas a Environments
 
 - `develop` → `NUBESTOCK_DEV`
 - `uat` → `NUBESTOCK_UAT`
@@ -94,7 +94,7 @@ Cada environment debe tener los siguientes secrets configurados:
 
 3. **Secrets**: Todos los secrets deben estar configurados en el repositorio del backend, organizados por environment.
 
-## 📝 Notas
+## Notas
 
 - Este es un workflow **reutilizable**, no se ejecuta directamente desde este repositorio
 - Los secrets se resuelven desde el repositorio que **llama** al workflow
