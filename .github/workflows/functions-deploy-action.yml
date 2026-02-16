@@ -78,8 +78,7 @@ on:
       NOTIFICATION_HUB_INTERNAL_KEY:
         required: true
       SONAR_TOKEN:
-        required: false
-        description: "Token de SonarCloud/SonarQube para análisis de calidad (opcional)"
+        required: true
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: backend-deploy
@@ -114,7 +113,6 @@ jobs:
         run: npm test
 
       - name: SonarQube Scan
-        if: ${{ secrets.SONAR_TOKEN != '' }}
         uses: SonarSource/sonarqube-scan-action@v6
         with:
           projectBaseDir: backend
