@@ -39,14 +39,98 @@ on:
       # Código para invocar el backend (?code=). Mismo valor que APP_KEY del backend.
       VITE_API_CODE:
         required: false
+      # Token de SonarCloud para análisis de calidad
+      SONAR_TOKEN:
+        required: false
+
 env:
   NODE_VERSION: ${{ inputs.node_version }}
   APP_LOCATION: ${{ inputs.app_location }}
   OUTPUT_LOCATION: ${{ inputs.output_location }}
 
 jobs:
+  quality:
+    name: Quality (tests + Sonar)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_OPTIONS: '--experimental-vm-modules'
+
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Wait for Sonar analysis
+        run: sleep 15
+
+      - name: Validate Sonar conditions
+        run: |
+          PROJECT_KEY=$(grep '^sonar.projectKey=' sonar-project.properties | cut -d= -f2)
+          echo "Getting metrics for component: $PROJECT_KEY"
+          METRICS=$(curl -s -u "$SONAR_TOKEN": \
+            "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=coverage,bugs,vulnerabilities")
+
+          COVERAGE=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"')
+          BUGS=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="bugs") | .value // "0"')
+          VULNERABILITIES=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="vulnerabilities") | .value // "0"')
+
+          COVERAGE=${COVERAGE:-0}
+          BUGS=${BUGS:-0}
+          VULNERABILITIES=${VULNERABILITIES:-0}
+
+          echo "Coverage: $COVERAGE%"
+          echo "Bugs: $BUGS"
+          echo "Vulnerabilities: $VULNERABILITIES"
+
+          FAIL=0
+
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage below 80%"
+            FAIL=1
+          fi
+
+          if [ "$BUGS" -gt 1 ]; then
+            echo "More than 1 bug detected"
+            FAIL=1
+          fi
+
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "Security vulnerabilities detected"
+            FAIL=1
+          fi
+
+          if [ "$FAIL" -eq 1 ]; then
+            echo "Sonar validation failed"
+            exit 1
+          else
+            echo "Sonar validation passed"
+          fi
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
   build_and_deploy:
     runs-on: ubuntu-latest
+    needs: quality
     permissions:
       contents: read
     environment:
