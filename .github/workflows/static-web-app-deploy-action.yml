@@ -72,6 +72,31 @@ jobs:
         env:
           NODE_OPTIONS: '--experimental-vm-modules'
 
+      - name: Debug Sonar Configuration
+        run: |
+          echo "=== DEBUG SONAR CONFIGURATION ==="
+          echo "Checking sonar-project.properties..."
+          if [ -f "sonar-project.properties" ]; then
+            echo "File exists!"
+            echo "Project Key: $(grep '^sonar.projectKey=' sonar-project.properties | cut -d= -f2)"
+            echo "Organization: $(grep '^sonar.organization=' sonar-project.properties | cut -d= -f2)"
+          else
+            echo "ERROR: sonar-project.properties NOT FOUND!"
+          fi
+          echo ""
+          echo "Checking SONAR_TOKEN..."
+          if [ -n "$SONAR_TOKEN" ]; then
+            TOKEN_LENGTH=${#SONAR_TOKEN}
+            TOKEN_PREFIX=${SONAR_TOKEN:0:4}
+            TOKEN_SUFFIX=${SONAR_TOKEN: -4}
+            echo "SONAR_TOKEN is SET (length: $TOKEN_LENGTH, preview: ${TOKEN_PREFIX}...${TOKEN_SUFFIX})"
+          else
+            echo "ERROR: SONAR_TOKEN is EMPTY or NOT SET!"
+          fi
+          echo "================================="
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
