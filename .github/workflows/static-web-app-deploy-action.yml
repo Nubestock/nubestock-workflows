@@ -194,10 +194,11 @@ jobs:
           VITE_API_CODE: ${{ secrets.VITE_API_CODE }}
         run: npm run build
 
-      - name: Generate staticwebapp.config.json (proxy al backend)
+      - name: Generate staticwebapp.config.json (SPA fallback + proxy opcional)
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
         run: |
+          # Siempre generar config con navigationFallback para que rutas como /reset-password sirvan index.html (SPA)
           if [ -n "$VITE_API_BASE_URL" ]; then
             cat > ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json << EOF
           {
@@ -206,14 +207,24 @@ jobs:
                 "route": "/api/*",
                 "rewrite": "${VITE_API_BASE_URL}/*"
               }
-            ]
+            ],
+            "navigationFallback": {
+              "rewrite": "/index.html"
+            }
           }
           EOF
-            echo "staticwebapp.config.json generado con backend: $VITE_API_BASE_URL"
-            cat ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json
+            echo "staticwebapp.config.json generado (proxy + SPA fallback). Backend: $VITE_API_BASE_URL"
           else
-            echo "VITE_API_BASE_URL no configurado - no se genera proxy"
+            cat > ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json << 'EOF'
+          {
+            "navigationFallback": {
+              "rewrite": "/index.html"
+            }
+          }
+          EOF
+            echo "staticwebapp.config.json generado (solo SPA fallback para /reset-password, etc.)"
           fi
+          cat ${{ env.OUTPUT_LOCATION }}/staticwebapp.config.json
 
       - name: Verify build output
         run: |
