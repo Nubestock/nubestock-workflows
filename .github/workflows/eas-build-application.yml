@@ -77,17 +77,17 @@ jobs:
         run: npm run test:ci
 
       - name: SonarQube Scan
-        if: ${{ inputs.run_sonar }}
+        if: ${{ inputs.run_sonar == true || inputs.run_sonar == 'true' }}
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Wait for Sonar analysis
-        if: ${{ inputs.run_sonar }}
+        if: ${{ inputs.run_sonar == true || inputs.run_sonar == 'true' }}
         run: sleep 15
 
       - name: Validate Sonar conditions (coverage >= 80%)
-        if: ${{ inputs.run_sonar }}
+        if: ${{ inputs.run_sonar == true || inputs.run_sonar == 'true' }}
         run: |
           PROJECT_KEY=$(grep '^sonar.projectKey=' sonar-project.properties | cut -d= -f2)
           echo "Getting metrics for component: $PROJECT_KEY"
