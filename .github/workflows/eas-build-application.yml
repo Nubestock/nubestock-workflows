@@ -1,0 +1,175 @@
+# Workflow reutilizable: EAS Build Application (Android o iOS)
+# Las variables de entorno se suben a EAS (env:push --force) y el build las usa en app.config.js
+name: EAS Build Application
+
+on:
+  workflow_call:
+    inputs:
+      node_version:
+        description: "Versión de Node.js"
+        required: false
+        type: string
+        default: "20"
+      eas_profile:
+        description: "Perfil EAS para el build (preview, production, etc.)"
+        required: false
+        type: string
+        default: "preview"
+      platform:
+        description: "Plataforma a compilar (android, ios)"
+        required: false
+        type: string
+        default: "android"
+    secrets:
+      EXPO_TOKEN:
+        required: true
+      API_URL:
+        required: true
+      API_URL_CODE:
+        required: true
+      API_TIMEOUT:
+        required: true
+      ADMIN_DASHBOARD_URL:
+        required: true
+      APP_NAME:
+        required: true
+      APP_VERSION:
+        required: true
+      AUTO_REFRESH_INTERVAL:
+        required: true
+      DEFAULT_PAGE_SIZE:
+        required: true
+      SONAR_TOKEN:
+        required: false
+
+env:
+  NODE_VERSION: ${{ inputs.node_version }}
+  EAS_PROFILE: ${{ inputs.eas_profile }}
+  PLATFORM: ${{ inputs.platform }}
+
+jobs:
+  quality:
+    name: Quality (tests + Sonar)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: SonarQube Scan
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Wait for Sonar analysis
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        run: sleep 15
+
+      - name: Validate Sonar conditions (coverage >= 80%)
+        if: ${{ secrets.SONAR_TOKEN != '' }}
+        run: |
+          PROJECT_KEY=$(grep '^sonar.projectKey=' sonar-project.properties | cut -d= -f2)
+          echo "Getting metrics for component: $PROJECT_KEY"
+          METRICS=$(curl -s -u "$SONAR_TOKEN": \
+            "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=coverage,bugs,vulnerabilities")
+          COVERAGE=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"')
+          BUGS=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="bugs") | .value // "0"')
+          VULNERABILITIES=$(echo "$METRICS" | jq -r '.component.measures[] | select(.metric=="vulnerabilities") | .value // "0"')
+          COVERAGE=${COVERAGE:-0}
+          BUGS=${BUGS:-0}
+          VULNERABILITIES=${VULNERABILITIES:-0}
+          echo "Coverage: $COVERAGE%"
+          echo "Bugs: $BUGS"
+          echo "Vulnerabilities: $VULNERABILITIES"
+          FAIL=0
+          if (( $(echo "$COVERAGE < 80" | bc -l) )); then
+            echo "Coverage below 80%"
+            FAIL=1
+          fi
+          if [ "$BUGS" -gt 1 ]; then
+            echo "More than 1 bug detected"
+            FAIL=1
+          fi
+          if [ "$VULNERABILITIES" -gt 0 ]; then
+            echo "Security vulnerabilities detected"
+            FAIL=1
+          fi
+          if [ "$FAIL" -eq 1 ]; then
+            echo "Sonar validation failed"
+            exit 1
+          fi
+          echo "Sonar validation passed"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  build:
+    name: Build application (${{ inputs.platform }})
+    runs-on: ubuntu-latest
+    needs: quality
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Crear o ACTUALIZAR variables en EAS (env:push --force = crea si no existen, sobrescribe si ya existen)
+      - name: Sync secrets to EAS
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          API_URL_CODE: ${{ secrets.API_URL_CODE }}
+          API_TIMEOUT: ${{ secrets.API_TIMEOUT }}
+          ADMIN_DASHBOARD_URL: ${{ secrets.ADMIN_DASHBOARD_URL }}
+          APP_NAME: ${{ secrets.APP_NAME }}
+          APP_VERSION: ${{ secrets.APP_VERSION }}
+          AUTO_REFRESH_INTERVAL: ${{ secrets.AUTO_REFRESH_INTERVAL }}
+          DEFAULT_PAGE_SIZE: ${{ secrets.DEFAULT_PAGE_SIZE }}
+        run: |
+          cat > .env.eas << EOF
+          API_URL=$API_URL
+          API_URL_CODE=$API_URL_CODE
+          API_TIMEOUT=$API_TIMEOUT
+          ADMIN_DASHBOARD_URL=$ADMIN_DASHBOARD_URL
+          APP_NAME=$APP_NAME
+          APP_VERSION=$APP_VERSION
+          AUTO_REFRESH_INTERVAL=$AUTO_REFRESH_INTERVAL
+          DEFAULT_PAGE_SIZE=$DEFAULT_PAGE_SIZE
+          EOF
+          eas env:push --environment ${{ env.EAS_PROFILE }} --path .env.eas --force --non-interactive
+          rm -f .env.eas
+
+      - name: Verify EAS environment variables
+        run: eas env:list --environment ${{ env.EAS_PROFILE }}
+
+      - name: Build application
+        run: eas build -p ${{ env.PLATFORM }} --profile ${{ env.EAS_PROFILE }} --non-interactive
