@@ -170,7 +170,7 @@ jobs:
           AUTO_REFRESH_INTERVAL=$AUTO_REFRESH_INTERVAL
           DEFAULT_PAGE_SIZE=$DEFAULT_PAGE_SIZE
           EOF
-          eas env:push --environment ${{ env.EAS_PROFILE }} --path .env.eas --force --non-interactive
+          eas env:push --environment ${{ env.EAS_PROFILE }} --path .env.eas --force
           rm -f .env.eas
 
       - name: Verify EAS environment variables
