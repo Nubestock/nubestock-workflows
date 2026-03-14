@@ -20,6 +20,11 @@ on:
         required: false
         type: string
         default: "android"
+      run_sonar:
+        description: "Ejecutar análisis Sonar (pasar true si se envía SONAR_TOKEN)"
+        required: false
+        type: boolean
+        default: false
     secrets:
       EXPO_TOKEN:
         required: true
@@ -72,17 +77,17 @@ jobs:
         run: npm test
 
       - name: SonarQube Scan
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ inputs.run_sonar }}
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Wait for Sonar analysis
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ inputs.run_sonar }}
         run: sleep 15
 
       - name: Validate Sonar conditions (coverage >= 80%)
-        if: ${{ secrets.SONAR_TOKEN != '' }}
+        if: ${{ inputs.run_sonar }}
         run: |
           PROJECT_KEY=$(grep '^sonar.projectKey=' sonar-project.properties | cut -d= -f2)
           echo "Getting metrics for component: $PROJECT_KEY"
