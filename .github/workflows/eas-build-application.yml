@@ -30,6 +30,10 @@ on:
         required: false
         type: boolean
         default: true
+      app_version:
+        description: "Versión de la app para este build (ej: 1.0.123). Si no se pasa, se usa APP_VERSION del secret."
+        required: false
+        type: string
     secrets:
       EXPO_TOKEN:
         required: true
@@ -44,7 +48,7 @@ on:
       APP_NAME:
         required: true
       APP_VERSION:
-        required: true
+        required: false
       AUTO_REFRESH_INTERVAL:
         required: true
       DEFAULT_PAGE_SIZE:
@@ -161,7 +165,7 @@ jobs:
           API_TIMEOUT: ${{ secrets.API_TIMEOUT }}
           ADMIN_DASHBOARD_URL: ${{ secrets.ADMIN_DASHBOARD_URL }}
           APP_NAME: ${{ secrets.APP_NAME }}
-          APP_VERSION: ${{ secrets.APP_VERSION }}
+          APP_VERSION: ${{ secrets.APP_VERSION || inputs.app_version || '1.0.0' }}
           AUTO_REFRESH_INTERVAL: ${{ secrets.AUTO_REFRESH_INTERVAL }}
           DEFAULT_PAGE_SIZE: ${{ secrets.DEFAULT_PAGE_SIZE }}
         run: |
