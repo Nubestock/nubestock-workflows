@@ -25,6 +25,11 @@ on:
         required: false
         type: boolean
         default: false
+      run_eas_update:
+        description: "Publicar OTA con eas update (mismo branch que el perfil: preview/production)"
+        required: false
+        type: boolean
+        default: true
     secrets:
       EXPO_TOKEN:
         required: true
@@ -178,3 +183,8 @@ jobs:
 
       - name: Build application
         run: eas build -p ${{ env.PLATFORM }} --profile ${{ env.EAS_PROFILE }} --non-interactive
+
+      - name: Publish OTA update (EAS Update)
+        if: ${{ inputs.run_eas_update == true || inputs.run_eas_update == 'true' }}
+        run: |
+          eas update --branch ${{ env.EAS_PROFILE }} --message "CI: ${{ github.sha }}" --non-interactive
